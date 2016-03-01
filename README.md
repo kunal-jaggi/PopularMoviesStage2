@@ -1,6 +1,6 @@
 # Popular Movies App, Stage 1
 
-Stage 1 of Popular Movies app required to complete Udacity Android Developer Nanodegree. This is an MVP that provides core experience of a movie search app. 
+Stage 2 of Popular Movies app required to complete Udacity Android Developer Nanodegree. 
 
 ### User Experience
 
