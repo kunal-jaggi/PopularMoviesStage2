@@ -1,4 +1,4 @@
-package com.udacity.popularmovies.stageone.adapter;
+package com.udacity.popularmovies.stagetwo.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,9 +8,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-import com.udacity.popularmovies.stageone.R;
-import com.udacity.popularmovies.stageone.network.model.Movie;
-import com.udacity.popularmovies.stageone.util.Constants;
+import com.udacity.popularmovies.stagetwo.R;
+import com.udacity.popularmovies.stagetwo.network.model.Movie;
+import com.udacity.popularmovies.stagetwo.util.Constants;
 
 import java.util.List;
 

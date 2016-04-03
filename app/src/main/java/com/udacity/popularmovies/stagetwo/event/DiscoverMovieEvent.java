@@ -1,4 +1,4 @@
-package com.udacity.popularmovies.stageone.event;
+package com.udacity.popularmovies.stagetwo.event;
 
 /**
  * This event class is used to represent an event which is triggered to fetch movies from Open Movie DB API.

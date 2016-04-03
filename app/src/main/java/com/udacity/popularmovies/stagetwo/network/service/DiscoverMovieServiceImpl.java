@@ -1,15 +1,15 @@
-package com.udacity.popularmovies.stageone.network.service;
+package com.udacity.popularmovies.stagetwo.network.service;
 
 import android.util.Log;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
-import com.udacity.popularmovies.stageone.event.DiscoverMovieEvent;
-import com.udacity.popularmovies.stageone.event.MovieEvent;
-import com.udacity.popularmovies.stageone.network.model.Movie;
-import com.udacity.popularmovies.stageone.network.model.MovieInfo;
-import com.udacity.popularmovies.stageone.singleton.PopularMoviesApplication;
-import com.udacity.popularmovies.stageone.util.Constants;
+import com.udacity.popularmovies.stagetwo.event.DiscoverMovieEvent;
+import com.udacity.popularmovies.stagetwo.event.MovieEvent;
+import com.udacity.popularmovies.stagetwo.network.model.Movie;
+import com.udacity.popularmovies.stagetwo.network.model.MovieInfo;
+import com.udacity.popularmovies.stagetwo.singleton.PopularMoviesApplication;
+import com.udacity.popularmovies.stagetwo.util.Constants;
 
 import java.util.List;
 

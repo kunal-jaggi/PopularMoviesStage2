@@ -1,4 +1,4 @@
-package com.udacity.popularmovies.stageone.view;
+package com.udacity.popularmovies.stagetwo.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,9 +16,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.udacity.popularmovies.stageone.R;
-import com.udacity.popularmovies.stageone.network.model.Movie;
-import com.udacity.popularmovies.stageone.util.Constants;
+import com.udacity.popularmovies.stagetwo.R;
+import com.udacity.popularmovies.stagetwo.network.model.Movie;
+import com.udacity.popularmovies.stagetwo.util.Constants;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

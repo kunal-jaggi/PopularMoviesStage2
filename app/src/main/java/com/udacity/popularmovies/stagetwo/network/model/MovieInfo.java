@@ -1,4 +1,4 @@
-package com.udacity.popularmovies.stageone.network.model;
+package com.udacity.popularmovies.stagetwo.network.model;
 
 /**
  * A POJO that represents Movie list from Open Movie DB API.

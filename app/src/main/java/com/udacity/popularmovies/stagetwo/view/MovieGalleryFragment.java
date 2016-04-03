@@ -1,4 +1,4 @@
-package com.udacity.popularmovies.stageone.view;
+package com.udacity.popularmovies.stagetwo.view;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,13 +14,13 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 
 import com.squareup.otto.Subscribe;
-import com.udacity.popularmovies.stageone.R;
-import com.udacity.popularmovies.stageone.adapter.GalleryItemAdapter;
-import com.udacity.popularmovies.stageone.event.DiscoverMovieEvent;
-import com.udacity.popularmovies.stageone.event.MovieEvent;
-import com.udacity.popularmovies.stageone.network.model.Movie;
-import com.udacity.popularmovies.stageone.network.service.DiscoverMovieServiceImpl;
-import com.udacity.popularmovies.stageone.singleton.PopularMoviesApplication;
+import com.udacity.popularmovies.stagetwo.R;
+import com.udacity.popularmovies.stagetwo.adapter.GalleryItemAdapter;
+import com.udacity.popularmovies.stagetwo.event.DiscoverMovieEvent;
+import com.udacity.popularmovies.stagetwo.event.MovieEvent;
+import com.udacity.popularmovies.stagetwo.network.model.Movie;
+import com.udacity.popularmovies.stagetwo.network.service.DiscoverMovieServiceImpl;
+import com.udacity.popularmovies.stagetwo.singleton.PopularMoviesApplication;
 
 
 import java.util.List;
