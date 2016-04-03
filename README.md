@@ -18,7 +18,7 @@ Stage 2 of Popular Movies app required to complete Udacity Android Developer Nan
 
 ### Change API Key
 
-In order to run the app, you must create your own Movie DB API key. See [here](https://www.themoviedb.org/documentation/api?language=en) for more info. Once you have crated an API key, insert the same in com.udacity.popularmovies.stageone.util.Constants.java file.   
+In order to run the app, you must create your own Movie DB API key. See [here](https://www.themoviedb.org/documentation/api?language=en) for more info. Once you have crated an API key, insert the same in stagetwo.util.Constants.java file.
  
 
 

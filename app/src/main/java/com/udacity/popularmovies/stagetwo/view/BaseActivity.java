@@ -1,4 +1,4 @@
-package com.udacity.popularmovies.stageone.view;
+package com.udacity.popularmovies.stagetwo.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.udacity.popularmovies.stageone.R;
+import com.udacity.popularmovies.stagetwo.R;
 
 /**
  * Parent of all Activities.

@@ -1,4 +1,4 @@
-package com.udacity.popularmovies.stageone.view;
+package com.udacity.popularmovies.stagetwo.view;
 
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -6,9 +6,9 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
-import com.udacity.popularmovies.stageone.R;
-import com.udacity.popularmovies.stageone.event.DiscoverMovieEvent;
-import com.udacity.popularmovies.stageone.singleton.PopularMoviesApplication;
+import com.udacity.popularmovies.stagetwo.R;
+import com.udacity.popularmovies.stagetwo.event.DiscoverMovieEvent;
+import com.udacity.popularmovies.stagetwo.singleton.PopularMoviesApplication;
 
 /**
  * Used to present a set of application settings.

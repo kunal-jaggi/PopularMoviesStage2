@@ -1,6 +1,6 @@
-package com.udacity.popularmovies.stageone.event;
+package com.udacity.popularmovies.stagetwo.event;
 
-import com.udacity.popularmovies.stageone.network.model.Movie;
+import com.udacity.popularmovies.stagetwo.network.model.Movie;
 
 import java.util.List;
 

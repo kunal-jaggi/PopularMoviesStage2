@@ -1,7 +1,8 @@
-package com.udacity.popularmovies.stageone.singleton;
+package com.udacity.popularmovies.stagetwo.singleton;
 
 import android.app.Application;
 
+import com.facebook.stetho.Stetho;
 import com.squareup.otto.Bus;
 
 /**
@@ -22,4 +23,9 @@ public class PopularMoviesApplication extends Application {
         return mEventBus;
     }
 
+    @Override
+    public void onCreate(){
+        super.onCreate();
+        Stetho.initializeWithDefaults(this);
+    }
 }

@@ -1,4 +1,4 @@
-package com.udacity.popularmovies.stageone;
+package com.udacity.popularmovies.stagetwo;
 
 import org.junit.Test;
 

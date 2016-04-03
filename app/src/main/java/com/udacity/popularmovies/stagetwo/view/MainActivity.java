@@ -1,8 +1,8 @@
-package com.udacity.popularmovies.stageone.view;
+package com.udacity.popularmovies.stagetwo.view;
 
 import android.os.Bundle;
 
-import com.udacity.popularmovies.stageone.R;
+import com.udacity.popularmovies.stagetwo.R;
 
 /**
  * This is the main launcher Activity for the app. This Activity registers an intent-filter with launcher app.

@@ -1,6 +1,6 @@
-package com.udacity.popularmovies.stageone.network.service;
+package com.udacity.popularmovies.stagetwo.network.service;
 
-import com.udacity.popularmovies.stageone.network.model.MovieInfo;
+import com.udacity.popularmovies.stagetwo.network.model.MovieInfo;
 
 import retrofit.Call;
 import retrofit.http.GET;

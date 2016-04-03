@@ -1,8 +1,8 @@
-package com.udacity.popularmovies.stageone.view;
+package com.udacity.popularmovies.stagetwo.view;
 
 import android.os.Bundle;
 
-import com.udacity.popularmovies.stageone.R;
+import com.udacity.popularmovies.stagetwo.R;
 
 /**
  * This Activity is used to show movie details.
