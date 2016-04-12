@@ -1,10 +1,14 @@
 package com.udacity.popularmovies.stagetwo.view;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,9 +18,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.popularmovies.stagetwo.R;
+import com.udacity.popularmovies.stagetwo.data.MovieContract;
 import com.udacity.popularmovies.stagetwo.network.model.Movie;
 import com.udacity.popularmovies.stagetwo.util.Constants;
 
@@ -25,6 +31,7 @@ import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * This Fragment class is added by DetailsActivity to show details screen.
@@ -41,7 +48,7 @@ public class DetailsFragment extends Fragment {
     @Bind(R.id.movieRating) TextView mMovieRating;
     @Bind(R.id.movieOverview) TextView mMovieOverview;
 
-    private String mMovieTitle;
+    private Movie mSelectedMovie;
 
     public DetailsFragment() {
     }
@@ -73,42 +80,103 @@ public class DetailsFragment extends Fragment {
         //Inspect the intent for movie data.
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(DetailsActivity.EXTRA_MOVIE)) {
-            Movie selectedMovie = intent.getParcelableExtra(DetailsActivity.EXTRA_MOVIE);
-            if (selectedMovie != null) {
-                mMovieTitle = selectedMovie.getmTitle();
-                fillDetailScreen(selectedMovie);
+            mSelectedMovie = intent.getParcelableExtra(DetailsActivity.EXTRA_MOVIE);
+            if (mSelectedMovie != null) {
+                fillDetailScreen();
             }
         }
 
         return view;
     }
 
+    @OnClick(R.id.saveMovieAsFav)
+    public void submit(View view) {
+
+        ContentValues insertValues = new ContentValues();
+        insertValues.put(MovieContract.MovieEntry._ID, mSelectedMovie.getmId());
+        insertValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, mSelectedMovie.getmOverview());
+        insertValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, mSelectedMovie.getmReleaseDate());
+        insertValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, mSelectedMovie.getmVoteAverage());
+        insertValues.put(MovieContract.MovieEntry.COLUMN_TITLE, mSelectedMovie.getmTitle());
+
+
+        Uri locationUri = getContext().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, insertValues);
+        Toast.makeText(getContext(), "Save Button CLicked,  URI PATH:"+ locationUri.getPath(), Toast.LENGTH_LONG).show();
+
+    }
+
     /**
      * Used to render original title, poster image, overview (plot), user rating and release date.
      *
-     * @param selectedMovie
      */
-    private void fillDetailScreen(final Movie selectedMovie) {
-        mMovieTileTxt.setText(selectedMovie.getmTitle());
+    private void fillDetailScreen() {
+        mMovieTileTxt.setText(mSelectedMovie.getmTitle());
         Picasso.with(getContext())
-                .load(Constants.MOVIE_DB_POSTER_URL + Constants.POSTER_PHONE_SIZE + selectedMovie.getmPosterPath())
+                .load(Constants.MOVIE_DB_POSTER_URL + Constants.POSTER_PHONE_SIZE + mSelectedMovie.getmPosterPath())
                 .placeholder(R.drawable.poster_placeholder) // support download placeholder
                 .error(R.drawable.poster_placeholder_error) //support error placeholder, if back-end returns empty string or null
                 .into(mMoviePoster);
-        mMovieRating.setText("" + selectedMovie.getmVoteAverage() + "/10");
-        mMovieOverview.setText(selectedMovie.getmOverview());
+        mMovieRating.setText("" + mSelectedMovie.getmVoteAverage() + "/10");
+        mMovieOverview.setText(mSelectedMovie.getmOverview());
 
         // Movie DB API returns release date in yyyy--mm-dd format
         // Extract the year through regex
         Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2})");
-        String year = selectedMovie.getmReleaseDate();
+        String year = mSelectedMovie.getmReleaseDate();
         Matcher dateMatcher = datePattern.matcher(year);
         if (dateMatcher.find()) {
             year = dateMatcher.group(1);
 
         }
         mMovieReleaseYear.setText(year);
+
+        Log.d(LOG_TAG, "Movie record exists: " + isMovieFavorite());
+
     }
+
+    /**
+     * Returns a boolean flag indicating is a specific movie is saved as a favorite within the local DB.
+     * @return boolean: return false if the cursor is empty, true otherwise.
+     */
+    private boolean isMovieFavorite(){
+        boolean favFlag= false;
+
+        // Defines a string to contain the selection clause
+        String selectionClause = null;
+
+// An array to contain selection arguments
+        String[] selectionArgs = null;
+
+// Gets a word from the UI
+        int movieID = mSelectedMovie.getmId();
+Log.d(LOG_TAG, "Movie ID " + movieID);
+
+            // Construct a selection clause that matches the word that the user entered.
+            selectionClause = MovieContract.MovieEntry._ID + " = ?";
+
+            // Use the user's input string as the (only) selection argument.
+            selectionArgs = new String[]{ ""+movieID };
+
+
+
+
+        Cursor movieCursor = getContext().getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI, // The content URI of the movie table
+                null,                                  // projection:  leaving "columns" null just returns all the columns.
+                selectionClause,                                  // selection criteria:  cols for "where" clause
+                selectionArgs,                                   // selection criteria: values for "where" clause
+                null                                               // sort order
+        );
+        if (movieCursor == null) {
+            favFlag = false;
+        }else if (movieCursor.getCount() < 1){
+            favFlag= false;
+        }else
+            favFlag= true;
+
+        return favFlag;
+    }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -141,7 +209,7 @@ public class DetailsFragment extends Fragment {
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET); //required to return to Popular Movies app
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT,
-                mMovieTitle + MOVIE_DETAILS_SHARE_HASHTAG);
+                mSelectedMovie.getmTitle() + MOVIE_DETAILS_SHARE_HASHTAG);
         return shareIntent;
     }
 }

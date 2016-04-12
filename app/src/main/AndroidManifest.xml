@@ -40,6 +40,11 @@
                 android:value="com.udacity.popularmovies.stagetwo.view.MainActivity" />
         </activity>
 
+
+        <provider
+            android:authorities="com.udacity.popularmovies.stagetwo"
+            android:name=".data.MovieProvider" />
+
     </application>
 
 </manifest>
