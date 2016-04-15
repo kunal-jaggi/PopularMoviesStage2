@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import com.facebook.stetho.common.StringUtil;
 import com.squareup.otto.Subscribe;
 import com.udacity.popularmovies.stagetwo.R;
 import com.udacity.popularmovies.stagetwo.adapter.GalleryItemAdapter;
@@ -21,6 +22,7 @@ import com.udacity.popularmovies.stagetwo.event.MovieEvent;
 import com.udacity.popularmovies.stagetwo.network.model.Movie;
 import com.udacity.popularmovies.stagetwo.network.service.DiscoverMovieServiceImpl;
 import com.udacity.popularmovies.stagetwo.singleton.PopularMoviesApplication;
+import com.udacity.popularmovies.stagetwo.util.GlobalRedirect;
 
 
 import java.util.List;
@@ -77,7 +79,16 @@ public class MovieGalleryFragment extends Fragment {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sortBy = prefs.getString(getString(R.string.pref_sort_key),
                 getString(R.string.pref_sort_order_default));
-        PopularMoviesApplication.getEventBus().post(produceDiscoverMovieEvent(sortBy));
+
+        if(sortBy!=null && sortBy.equalsIgnoreCase(getResources().getString(R.string.pref_sort_by_favorite))){
+            //User is still on favorite, route to favorite activity
+            GlobalRedirect.routeToFavoriteActivity(getContext());
+            //getActivity().finish();
+        }else{
+            //make a REST call
+            PopularMoviesApplication.getEventBus().post(produceDiscoverMovieEvent(sortBy));
+        }
+
     }
 
     @Override
