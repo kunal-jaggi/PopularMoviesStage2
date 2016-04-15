@@ -56,6 +56,7 @@ public class DiscoverMovieServiceImpl {
 
         Call<MovieInfo> restCall = api.getPopularMovies(event.getmSortBy(), Constants.MOVIE_DB_API_KEY);
 
+        Log.d(LOG_TAG, "Making REST call to fetch movies. Sort criteria: "+event.getmSortBy());
         restCall.enqueue(new Callback<MovieInfo>() {
             @Override
             public void onResponse(Response<MovieInfo> response, Retrofit retrofit) {

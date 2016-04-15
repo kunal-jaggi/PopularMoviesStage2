@@ -10,6 +10,7 @@
     <!-- Labels for Activity titles -->
     <string name="title_activity_details">Movie Details</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_favorite">Favorites</string>
 
     <!-- Default postal code for location preference [CHAR LIMIT=NONE] -->
     <string name="pref_sort_order_default" translatable="false">popularity.desc</string>
@@ -23,6 +24,9 @@
     <!-- Label for discover movie option in highest rated/voted sort order preference [CHAR LIMIT=25] -->
     <string name="pref_sort_label_highest_rated">Highest rated</string>
 
+    <!-- Label for discover movie option in Favorites sort order preference [CHAR LIMIT=25] -->
+    <string name="pref_sort_label_favorite">Favorite</string>
+
     <!-- Key name for temperature unit preference in SharedPreferences [CHAR LIMIT=NONE] -->
     <string name="pref_sort_key" translatable="false">sortBy</string>
 
@@ -31,6 +35,9 @@
 
     <!-- Value in SharedPreferences for most rated/voted  movie discover option [CHAR LIMIT=NONE] -->
     <string name="pref_sort_by_rating" translatable="false">vote_average.desc</string>
+
+    <!-- Value in SharedPreferences for most rated/voted  movie discover option [CHAR LIMIT=NONE] -->
+    <string name="pref_sort_by_favorite" translatable="false">favorite</string>
 
 
 </resources>

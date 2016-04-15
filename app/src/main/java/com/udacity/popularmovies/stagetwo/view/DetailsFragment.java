@@ -208,8 +208,12 @@ Log.d(LOG_TAG, "Movie ID " + movieID);
         Intent shareIntent = new Intent(Intent.ACTION_SEND); //generic action
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET); //required to return to Popular Movies app
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
-                mSelectedMovie.getmTitle() + MOVIE_DETAILS_SHARE_HASHTAG);
+
+        if(mSelectedMovie != null){
+            shareIntent.putExtra(Intent.EXTRA_TEXT,
+                    mSelectedMovie.getmTitle() + MOVIE_DETAILS_SHARE_HASHTAG);
+        }
+
         return shareIntent;
     }
 }
