@@ -4,8 +4,12 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.text.TextUtils;
@@ -16,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +30,7 @@ import com.udacity.popularmovies.stagetwo.R;
 import com.udacity.popularmovies.stagetwo.data.MovieContract;
 import com.udacity.popularmovies.stagetwo.network.model.Movie;
 import com.udacity.popularmovies.stagetwo.util.Constants;
+import com.udacity.popularmovies.stagetwo.util.Utility;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,23 +38,52 @@ import java.util.regex.Pattern;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnItemClick;
 
 /**
  * This Fragment class is added by DetailsActivity to show details screen.
  * Created by kunaljaggi on 2/20/16.
  */
-public class DetailsFragment extends Fragment {
+public class DetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = DetailsFragment.class.getSimpleName();
     private static final String MOVIE_DETAILS_SHARE_HASHTAG = " #PopularMoviesApp";
 
-    @Bind(R.id.movieTitle) TextView mMovieTileTxt;
-    @Bind(R.id.moviePoster) ImageView mMoviePoster;
-    @Bind(R.id.movieReleaseYear) TextView mMovieReleaseYear;
-    @Bind(R.id.movieRating) TextView mMovieRating;
-    @Bind(R.id.movieOverview) TextView mMovieOverview;
+    @Bind(R.id.movieTitle)
+    TextView mMovieTileTxt;
+    @Bind(R.id.moviePoster)
+    ImageView mMoviePoster;
+    @Bind(R.id.movieReleaseYear)
+    TextView mMovieReleaseYear;
+    @Bind(R.id.movieRating)
+    TextView mMovieRating;
+    @Bind(R.id.movieOverview)
+    TextView mMovieOverview;
+    @Bind(R.id.favoriteIcon)
+    ImageView mMovieFavorite;
 
-    private Movie mSelectedMovie;
+    private static final int DETAIL_LOADER = 0;
+
+    private static final String[] MOVIE_COLUMNS = {
+            MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
+            MovieContract.MovieEntry.COLUMN_TITLE,
+            MovieContract.MovieEntry.COLUMN_OVERVIEW,
+            MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE,
+            MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
+            MovieContract.MovieEntry.COLUMN_POSTER_PATH,
+            MovieContract.MovieEntry.COLUMN_IS_FAVORITE
+    };
+
+    // these constants correspond to the projection defined above, and must change if the
+    // projection changes
+    private static final int COL_MOVIE_ID = 0;
+    private static final int COL_MOVIE_TITLE = 1;
+    private static final int COL_MOVIE_OVERVIEW = 2;
+    private static final int COL_MOVIE_VOTE_AVERAGE = 3;
+    private static final int COL_MOVIE_RELEASE_DATE = 4;
+    private static final int COL_MOVIE_POSTER_PATH = 5;
+    private static final int COL_MOVIE_IS_FAVORITE = 6;
+
 
     public DetailsFragment() {
     }
@@ -57,6 +92,9 @@ public class DetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);// fragment should handle menu events.
+        setRetainInstance(true);
+
+        // Retain this fragment across configuration changes.
         setRetainInstance(true);
     }
 
@@ -76,107 +114,133 @@ public class DetailsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_details, container, false);
         ButterKnife.bind(this, view);
 
-        //Parent activity is started by firing-off an explicit intent.
-        //Inspect the intent for movie data.
-        Intent intent = getActivity().getIntent();
-        if (intent != null && intent.hasExtra(DetailsActivity.EXTRA_MOVIE)) {
-            mSelectedMovie = intent.getParcelableExtra(DetailsActivity.EXTRA_MOVIE);
-            if (mSelectedMovie != null) {
-                fillDetailScreen();
-            }
-        }
-
         return view;
     }
 
-    @OnClick(R.id.saveMovieAsFav)
-    public void submit(View view) {
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(DETAIL_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
 
-        ContentValues insertValues = new ContentValues();
-        insertValues.put(MovieContract.MovieEntry._ID, mSelectedMovie.getmId());
-        insertValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, mSelectedMovie.getmOverview());
-        insertValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, mSelectedMovie.getmReleaseDate());
-        insertValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, mSelectedMovie.getmVoteAverage());
-        insertValues.put(MovieContract.MovieEntry.COLUMN_TITLE, mSelectedMovie.getmTitle());
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(LOG_TAG, "In onCreateLoader");
+        Intent intent = getActivity().getIntent();
+        if (intent == null) {
+            return null;
+        }
 
+        int movieID = intent.getIntExtra(DetailsActivity.EXTRA_MOVIE, -1);
+        String selectionClause = MovieContract.MovieEntry._ID + " = ?";
+        String[] selectionArgs = new String[]{"" + movieID};
 
-        Uri locationUri = getContext().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, insertValues);
-        Toast.makeText(getContext(), "Save Button CLicked,  URI PATH:"+ locationUri.getPath(), Toast.LENGTH_LONG).show();
+        // Now create and return a CursorLoader that will take care of
+        // creating a Cursor for the data being displayed.
+        return new CursorLoader(
+                getActivity(),
+                intent.getData(),
+                MOVIE_COLUMNS,      //projection
+                selectionClause,    //selection
+                selectionArgs,      //selection args
+                null                //sort order
+        );
+    }
 
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Log.v(LOG_TAG, "In onLoadFinished");
+        if (!cursor.moveToFirst()) {
+            return;
+        }
+
+        fillDetailScreen(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
     }
 
     /**
      * Used to render original title, poster image, overview (plot), user rating and release date.
-     *
      */
-    private void fillDetailScreen() {
-        mMovieTileTxt.setText(mSelectedMovie.getmTitle());
+    private void fillDetailScreen(Cursor data) {
+        final int movieID = data.getInt(COL_MOVIE_ID);
+        String movieTitle = data.getString(COL_MOVIE_TITLE);
+        String movieOverview = data.getString(COL_MOVIE_OVERVIEW);
+        String movieVotes = data.getString(COL_MOVIE_VOTE_AVERAGE);
+        String movieReleaseDate = data.getString(COL_MOVIE_RELEASE_DATE);
+        String moviePosterPath = data.getString(COL_MOVIE_POSTER_PATH);
+        final boolean isFavorite = data.getInt(COL_MOVIE_IS_FAVORITE) > 0;
+
+        mMovieTileTxt.setText(movieTitle);
         Picasso.with(getContext())
-                .load(Constants.MOVIE_DB_POSTER_URL + Constants.POSTER_PHONE_SIZE + mSelectedMovie.getmPosterPath())
+                .load(Constants.MOVIE_DB_POSTER_URL + Constants.POSTER_PHONE_SIZE + moviePosterPath)
                 .placeholder(R.drawable.poster_placeholder) // support download placeholder
                 .error(R.drawable.poster_placeholder_error) //support error placeholder, if back-end returns empty string or null
                 .into(mMoviePoster);
-        mMovieRating.setText("" + mSelectedMovie.getmVoteAverage() + "/10");
-        mMovieOverview.setText(mSelectedMovie.getmOverview());
+
+        //we only want to display ratings rounded up to 3 chars max (e.g. 6.3)
+        if (movieVotes != null && movieVotes.length() >= 3) {
+            movieVotes = movieVotes.substring(0, 3);
+        }
+        mMovieRating.setText("" + movieVotes + "/10");
+        mMovieOverview.setText(movieOverview);
 
         // Movie DB API returns release date in yyyy--mm-dd format
         // Extract the year through regex
         Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2})");
-        String year = mSelectedMovie.getmReleaseDate();
-        Matcher dateMatcher = datePattern.matcher(year);
+        Matcher dateMatcher = datePattern.matcher(movieReleaseDate);
         if (dateMatcher.find()) {
-            year = dateMatcher.group(1);
+            movieReleaseDate = dateMatcher.group(1);
 
         }
-        mMovieReleaseYear.setText(year);
+        mMovieReleaseYear.setText(movieReleaseDate);
 
-        Log.d(LOG_TAG, "Movie record exists: " + isMovieFavorite());
+        if (isFavorite) {
+            showFavoriteIcon(mMovieFavorite, R.drawable.ic_favorite_black_24dp);
+        } else {
+            showFavoriteIcon(mMovieFavorite, R.drawable.ic_favorite_border_black_24dp);
+        }
+
+
+        mMovieFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create and execute the background task.
+                DBUpdateTask task = new DBUpdateTask(isFavorite, movieID);
+                task.execute();
+
+//                ContentValues updateValues = new ContentValues();
+//                if (isFavorite) {
+//                    updateValues.put(MovieContract.MovieEntry.COLUMN_IS_FAVORITE, 0);
+//                } else {
+//                    updateValues.put(MovieContract.MovieEntry.COLUMN_IS_FAVORITE, 1);
+//                }
+//
+//                // Defines selection criteria for the rows you want to update
+//                String selectionClause = MovieContract.MovieEntry._ID + " = ?";
+//                String[] selectionArgs = new String[]{"" + movieID};
+//
+//                // Defines a variable to contain the number of updated rows
+//                int rowsUpdated = 0;
+//
+//
+//                rowsUpdated = getContext().getContentResolver().update(
+//                        MovieContract.MovieEntry.CONTENT_URI,  // the user dictionary content URI
+//                        updateValues,                       // the columns to update
+//                        selectionClause,                    // the column to select on
+//                        selectionArgs);                      // the value to compare to
+
+            }
+        });
 
     }
 
-    /**
-     * Returns a boolean flag indicating is a specific movie is saved as a favorite within the local DB.
-     * @return boolean: return false if the cursor is empty, true otherwise.
-     */
-    private boolean isMovieFavorite(){
-        boolean favFlag= false;
-
-        // Defines a string to contain the selection clause
-        String selectionClause = null;
-
-// An array to contain selection arguments
-        String[] selectionArgs = null;
-
-// Gets a word from the UI
-        int movieID = mSelectedMovie.getmId();
-Log.d(LOG_TAG, "Movie ID " + movieID);
-
-            // Construct a selection clause that matches the word that the user entered.
-            selectionClause = MovieContract.MovieEntry._ID + " = ?";
-
-            // Use the user's input string as the (only) selection argument.
-            selectionArgs = new String[]{ ""+movieID };
-
-
-
-
-        Cursor movieCursor = getContext().getContentResolver().query(
-                MovieContract.MovieEntry.CONTENT_URI, // The content URI of the movie table
-                null,                                  // projection:  leaving "columns" null just returns all the columns.
-                selectionClause,                                  // selection criteria:  cols for "where" clause
-                selectionArgs,                                   // selection criteria: values for "where" clause
-                null                                               // sort order
-        );
-        if (movieCursor == null) {
-            favFlag = false;
-        }else if (movieCursor.getCount() < 1){
-            favFlag= false;
-        }else
-            favFlag= true;
-
-        return favFlag;
+    private void showFavoriteIcon(ImageView image, int resoureId) {
+        image.setImageResource(resoureId);
+        image.setVisibility(View.VISIBLE);
     }
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -209,11 +273,71 @@ Log.d(LOG_TAG, "Movie ID " + movieID);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET); //required to return to Popular Movies app
         shareIntent.setType("text/plain");
 
-        if(mSelectedMovie != null){
+        if (mMovieTileTxt != null) {
             shareIntent.putExtra(Intent.EXTRA_TEXT,
-                    mSelectedMovie.getmTitle() + MOVIE_DETAILS_SHARE_HASHTAG);
+                    mMovieTileTxt.getText() + MOVIE_DETAILS_SHARE_HASHTAG);
         }
 
         return shareIntent;
+    }
+
+
+    private class DBUpdateTask extends AsyncTask<Void, Integer, Void> {
+
+        boolean mIsFavorite;
+        int movieID;
+
+        DBUpdateTask(boolean mIsFavorite, int movieID){
+            this.mIsFavorite= mIsFavorite;
+            this.movieID= movieID;
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        /**
+         * Note that we do NOT call the callback object's methods
+         * directly from the background thread, as this could result
+         * in a race condition.
+         */
+        @Override
+        protected Void doInBackground(Void... ignore) {
+            ContentValues updateValues = new ContentValues();
+            if (mIsFavorite) {
+                updateValues.put(MovieContract.MovieEntry.COLUMN_IS_FAVORITE, 0);
+            } else {
+                updateValues.put(MovieContract.MovieEntry.COLUMN_IS_FAVORITE, 1);
+            }
+
+            // Defines selection criteria for the rows you want to update
+            String selectionClause = MovieContract.MovieEntry._ID + " = ?";
+            String[] selectionArgs = new String[]{"" + movieID};
+
+            // Defines a variable to contain the number of updated rows
+            int rowsUpdated = 0;
+
+
+            rowsUpdated = getContext().getContentResolver().update(
+                    MovieContract.MovieEntry.CONTENT_URI,  // the user dictionary content URI
+                    updateValues,                       // the columns to update
+                    selectionClause,                    // the column to select on
+                    selectionArgs);                      // the value to compare to
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... percent) {
+        }
+
+        @Override
+        protected void onCancelled() {
+        }
+
+        @Override
+        protected void onPostExecute(Void ignore) {
+
+        }
     }
 }

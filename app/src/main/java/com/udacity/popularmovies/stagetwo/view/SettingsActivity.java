@@ -1,16 +1,11 @@
 package com.udacity.popularmovies.stagetwo.view;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 
 import com.udacity.popularmovies.stagetwo.R;
-import com.udacity.popularmovies.stagetwo.event.DiscoverMovieEvent;
-import com.udacity.popularmovies.stagetwo.singleton.PopularMoviesApplication;
-import com.udacity.popularmovies.stagetwo.util.GlobalRedirect;
 
 /**
  * Used to present a set of application settings.
@@ -62,15 +57,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     public boolean onPreferenceChange(Preference preference, Object value) {
         String stringValue = value.toString();
 
-//        //if user click
-//        if (preference instanceof ListPreference && stringValue.equalsIgnoreCase(getResources().getString(R.string.pref_sort_by_favorite))) {
-//
-//            GlobalRedirect.routeToFavoriteActivity(this);
-//            finish();
-//
-//        } else
         if (preference instanceof ListPreference) {
-            PopularMoviesApplication.getEventBus().post(produceDiscoverMovieEvent(stringValue));
+            //PopularMoviesApplication.getEventBus().post(Utility.produceDiscoverMovieEvent(stringValue));
             // For list preferences, look up the correct display value in
             // the preference's 'entries' list (since they have separate labels/values).
             ListPreference listPreference = (ListPreference) preference;
@@ -84,10 +72,4 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         }
         return true;
     }
-
-    //Can this be a utility function??
-    public DiscoverMovieEvent produceDiscoverMovieEvent(String queryParam) {
-        return new DiscoverMovieEvent(queryParam);
-    }
-
 }

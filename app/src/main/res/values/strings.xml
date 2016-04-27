@@ -10,7 +10,6 @@
     <!-- Labels for Activity titles -->
     <string name="title_activity_details">Movie Details</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="title_activity_favorite">Favorites</string>
 
     <!-- Default postal code for location preference [CHAR LIMIT=NONE] -->
     <string name="pref_sort_order_default" translatable="false">popularity.desc</string>

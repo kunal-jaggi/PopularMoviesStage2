@@ -50,9 +50,13 @@ public class MovieContract {
 
         public static final String TABLE_NAME = "movie";
         public static final String COLUMN_TITLE = "title";
-        public static final String COLUMN_RELEASE_DATE = "release_date";
-        public static final String COLUMN_VOTE_AVERAGE = "vote_average";
         public static final String COLUMN_OVERVIEW = "overview";
+        public static final String COLUMN_VOTE_AVERAGE = "vote_average";
+        public static final String COLUMN_RELEASE_DATE = "release_date";
+        public static final String COLUMN_POSTER_PATH = "poster_path";
+        public static final String COLUMN_IS_POPULAR = "isPopular";
+        public static final String COLUMN_IS_RATED = "isRated";
+        public static final String COLUMN_IS_FAVORITE = "isFavorite";
 
         /**
          * This should form a URI Query:
@@ -63,5 +67,6 @@ public class MovieContract {
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
     }
 }
