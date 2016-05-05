@@ -53,13 +53,15 @@ public class MovieGalleryFragment extends Fragment implements LoaderManager.Load
     // Specify the columns we need.
     private static final String[] MOVIE_COLUMNS = {
             MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
+            MovieContract.MovieEntry.COLUMN_TITLE,
             MovieContract.MovieEntry.COLUMN_POSTER_PATH
     };
 
     // these constants correspond to the projection defined above, and must change if the
     // projection changes
     private static final int COL_MOVIE_ID = 0;
-    private static final int COL_MOVIE_POSTER_PATH = 1;
+    private static final int COL_MOVIE_TITLE = 1;
+    private static final int COL_MOVIE_POSTER_PATH = 2;
 
     public MovieGalleryFragment() {
     }
@@ -220,9 +222,13 @@ public class MovieGalleryFragment extends Fragment implements LoaderManager.Load
      */
     @OnItemClick(R.id.moviesGrid)
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
         // CursorAdapter returns a cursor at the correct position for getItem(), or null
         // if it cannot seek to that position.
         Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+
+        Log.d(LOG_TAG, "Grid view item clicked: position: "+position+ " movie ID: "+cursor.getInt(COL_MOVIE_ID)+ " movie title: "+ cursor.getString(COL_MOVIE_TITLE)+ " poster path: "+ cursor.getString(COL_MOVIE_POSTER_PATH));
+
         if (cursor != null) {
             String locationSetting = Utility.getPreferredSortingCriteria(getActivity());
             Intent intent = new Intent(getActivity(), DetailsActivity.class)

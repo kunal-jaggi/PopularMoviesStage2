@@ -3,6 +3,7 @@ package com.udacity.popularmovies.stagetwo.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,8 @@ import butterknife.ButterKnife;
 
 public class GalleryItemAdapter extends CursorAdapter {
 
+    private static final String LOG_TAG = GalleryItemAdapter.class.getSimpleName();
+
     private Context mContext;
     @Bind(R.id.gallery_item_imageView) ImageView imageView;
 
@@ -47,6 +50,9 @@ public class GalleryItemAdapter extends CursorAdapter {
      */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        //Picasso.with(mContext).invalidate(Constants.MOVIE_DB_POSTER_URL + Constants.POSTER_PHONE_SIZE + convertCursorRowToUXFormat(cursor));
+        Log.d(LOG_TAG, "Loading image... for movie ID: "+cursor.getInt(0)+ " movie title: "+ cursor.getString(1)+ " poster path: "+ cursor.getString(2));
+
         Picasso.with(mContext)
                 .load(Constants.MOVIE_DB_POSTER_URL + Constants.POSTER_PHONE_SIZE + convertCursorRowToUXFormat(cursor))
                 .placeholder(R.drawable.poster_placeholder) // support download placeholder
@@ -60,6 +66,7 @@ public class GalleryItemAdapter extends CursorAdapter {
     private String convertCursorRowToUXFormat(Cursor cursor) {
         // get row indices for our cursor
         int idx_movie_poster_path = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
+        Log.d(LOG_TAG, "Column Index: "+idx_movie_poster_path);
         return cursor.getString(idx_movie_poster_path);
     }
 }

@@ -10,8 +10,12 @@ import com.udacity.popularmovies.stagetwo.R;
 import com.udacity.popularmovies.stagetwo.data.MovieContract;
 import com.udacity.popularmovies.stagetwo.event.DiscoverMovieEvent;
 import com.udacity.popularmovies.stagetwo.event.MovieEvent;
+import com.udacity.popularmovies.stagetwo.event.MovieReviewsEvent;
+import com.udacity.popularmovies.stagetwo.event.MovieTrailersEvent;
 import com.udacity.popularmovies.stagetwo.network.model.Movie;
 import com.udacity.popularmovies.stagetwo.network.model.MovieInfo;
+import com.udacity.popularmovies.stagetwo.network.model.ReviewInfo;
+import com.udacity.popularmovies.stagetwo.network.model.TrailerInfo;
 import com.udacity.popularmovies.stagetwo.singleton.PopularMoviesApplication;
 import com.udacity.popularmovies.stagetwo.util.Constants;
 import com.udacity.popularmovies.stagetwo.util.Utility;
@@ -36,7 +40,6 @@ public class DiscoverMovieServiceImpl {
     private Context mContext;
 
     private static final String LOG_TAG = DiscoverMovieServiceImpl.class.getSimpleName();
-    private static final String LOG_REST = "REST";
 
     public DiscoverMovieServiceImpl(Bus eventBus) {
         mEventBus = eventBus;
@@ -69,7 +72,7 @@ public class DiscoverMovieServiceImpl {
 
         Call<MovieInfo> restCall = api.getPopularMovies(event.getmSortBy(), Constants.MOVIE_DB_API_KEY);
 
-        Log.d(LOG_REST, "Making REST call to fetch movies. Sort criteria: "+event.getmSortBy());
+        Log.d(LOG_TAG, "Making REST call to fetch movies. Sort criteria: "+event.getmSortBy());
         restCall.enqueue(new Callback<MovieInfo>() {
             @Override
             public void onResponse(Response<MovieInfo> response, Retrofit retrofit) {
@@ -79,6 +82,46 @@ public class DiscoverMovieServiceImpl {
                     mMovieList = movieInfo.getmMovieList();
                     insertMoveRecords(mMovieList);
                     PopularMoviesApplication.getEventBus().post(Utility.produceMovieEvent());
+                } else {
+                    //request not successful (like 400,401,403 etc)
+                    //Handle errors
+                    Log.d(LOG_TAG, "Web call error. response: "+response);
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(LOG_TAG, "Web call error. exception: "+toString());
+            }
+        });
+    }
+
+    /**
+     * Used to make a async call to movies DB to fetch ratings for a specific movie.
+     *
+     * @param event
+     */
+    @Subscribe
+    public void onMovieReviewsEvent(MovieReviewsEvent event) {
+
+        Retrofit client = new Retrofit.Builder()
+                .baseUrl(Constants.MOVIE_DB_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        DiscoverMovieService api = client.create(DiscoverMovieService.class);
+
+        Call<ReviewInfo> restCall = api.getReviews(event.getmMovieId(), Constants.MOVIE_DB_API_KEY);
+
+        Log.d(LOG_TAG, "Making REST call to fetch movie reviews. Movie ID: "+event.getmMovieId());
+        restCall.enqueue(new Callback<ReviewInfo>() {
+            @Override
+            public void onResponse(Response<ReviewInfo> response, Retrofit retrofit) {
+                if (response.isSuccess()) {
+                    // request successful (status code 200, 201)
+                    ReviewInfo movieReviews = response.body();
+                    PopularMoviesApplication.getEventBus().post(Utility.produceReviewEvent(movieReviews.getmReviewList()));
+                    Log.d(LOG_TAG, "Reviews Result count : "+movieReviews.getmReviewList().size());
                 } else {
                     //request not successful (like 400,401,403 etc)
                     //Handle errors
@@ -93,6 +136,45 @@ public class DiscoverMovieServiceImpl {
         });
     }
 
+    /**
+     * Used to make a async call to movies DB to fetch trailers for a specific movie.
+     *
+     * @param event
+     */
+    @Subscribe
+    public void onMovieTrailersEvent(MovieTrailersEvent event) {
+
+        Retrofit client = new Retrofit.Builder()
+                .baseUrl(Constants.MOVIE_DB_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        DiscoverMovieService api = client.create(DiscoverMovieService.class);
+
+        Call<TrailerInfo> restCall = api.getTrailers(event.getmMovieId(), Constants.MOVIE_DB_API_KEY);
+
+        Log.d(LOG_TAG, "Making REST call to fetch movie trailers. Movie ID: "+event.getmMovieId());
+        restCall.enqueue(new Callback<TrailerInfo>() {
+            @Override
+            public void onResponse(Response<TrailerInfo> response, Retrofit retrofit) {
+                if (response.isSuccess()) {
+                    // request successful (status code 200, 201)
+                    TrailerInfo movieTrailers = response.body();
+                    PopularMoviesApplication.getEventBus().post(Utility.produceTrailerEvent(movieTrailers.getmResults()));
+                    Log.d(LOG_TAG, "Trailer Result count : "+movieTrailers.getmResults());
+                } else {
+                    //request not successful (like 400,401,403 etc)
+                    //Handle errors
+                    Log.d(LOG_TAG, "Web call error");
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
+    }
 
     private void insertMoveRecords(final List<Movie> movieList){
         // Insert the new weather information into the database

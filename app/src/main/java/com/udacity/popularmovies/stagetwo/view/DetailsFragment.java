@@ -1,6 +1,7 @@
 package com.udacity.popularmovies.stagetwo.view;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -11,6 +12,10 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ShareActionProvider;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,20 +23,36 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.udacity.popularmovies.stagetwo.R;
+import com.udacity.popularmovies.stagetwo.adapter.MovieReviewAdapter;
+import com.udacity.popularmovies.stagetwo.adapter.MovieTrailerAdapter;
 import com.udacity.popularmovies.stagetwo.data.MovieContract;
+import com.udacity.popularmovies.stagetwo.event.MovieEvent;
+import com.udacity.popularmovies.stagetwo.event.ReviewEvent;
+import com.udacity.popularmovies.stagetwo.event.TrailerEvent;
 import com.udacity.popularmovies.stagetwo.network.model.Movie;
+import com.udacity.popularmovies.stagetwo.network.model.MovieReview;
+import com.udacity.popularmovies.stagetwo.network.model.Trailer;
+import com.udacity.popularmovies.stagetwo.network.service.DiscoverMovieServiceImpl;
+import com.udacity.popularmovies.stagetwo.singleton.PopularMoviesApplication;
 import com.udacity.popularmovies.stagetwo.util.Constants;
 import com.udacity.popularmovies.stagetwo.util.Utility;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +60,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
+import su.j2e.rvjoiner.JoinableAdapter;
+import su.j2e.rvjoiner.JoinableLayout;
+import su.j2e.rvjoiner.RvJoiner;
 
 /**
  * This Fragment class is added by DetailsActivity to show details screen.
@@ -49,18 +73,27 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     private static final String LOG_TAG = DetailsFragment.class.getSimpleName();
     private static final String MOVIE_DETAILS_SHARE_HASHTAG = " #PopularMoviesApp";
 
-    @Bind(R.id.movieTitle)
+    //@Bind(R.id.movieTitle)
     TextView mMovieTileTxt;
-    @Bind(R.id.moviePoster)
+    //@Bind(R.id.moviePoster)
     ImageView mMoviePoster;
-    @Bind(R.id.movieReleaseYear)
+    //@Bind(R.id.movieReleaseYear)
     TextView mMovieReleaseYear;
-    @Bind(R.id.movieRating)
+    //@Bind(R.id.movieRating)
     TextView mMovieRating;
-    @Bind(R.id.movieOverview)
+    //@Bind(R.id.movieOverview)
     TextView mMovieOverview;
-    @Bind(R.id.favoriteIcon)
+    //@Bind(R.id.favoriteIcon)
     ImageView mMovieFavorite;
+    //@Bind(R.id.movieReviews)
+   // RecyclerView mMovieReviewList;
+    //@Bind(R.id.movieTrailers)
+   // RecyclerView mMovieTrailerList;
+
+    RecyclerView rv;
+    RvJoiner rvJoiner = new RvJoiner();
+    MovieTrailerAdapter trailerAdapter;
+    MovieReviewAdapter reviewAdapter;
 
     private static final int DETAIL_LOADER = 0;
 
@@ -99,8 +132,16 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(LOG_TAG, "onStart called");
+        PopularMoviesApplication.getEventBus().register(this);
+    }
+    @Override
     public void onPause() {
         super.onPause();
+        Log.d(LOG_TAG, "onPause called");
+        PopularMoviesApplication.getEventBus().unregister(this);
     }
 
     @Override
@@ -108,13 +149,56 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         super.onResume();
     }
 
+    //old implementation
+    /*
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_details, container, false);
         ButterKnife.bind(this, view);
 
+        View reviewView = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.list_item_reviews, container, false);
+
+        mMovieReviewList = (ListView) reviewView.findViewById(R.id.movieReviews);
+        //handleListViewScrolling(mMovieReviewList);
+        setupAdapter(null);
         return view;
+    }
+    */
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        //View trailerView = inflater.inflate(R.layout.list_item_trailers, container, false);
+        //mMovieTrailerList= (RecyclerView) trailerView.findViewById(R.id.movieTrailersList);
+         //ButterKnife.bind(this, trailerView);
+        View viewRecycler = inflater.inflate(R.layout.fragment_details, container, false);
+        rv = (RecyclerView) viewRecycler.findViewById(R.id.rv);
+        rv.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        trailerAdapter= new MovieTrailerAdapter(null, getContext());
+        reviewAdapter= new MovieReviewAdapter(null);
+
+        rvJoiner.add(new JoinableLayout(R.layout.movie_details));
+        rvJoiner.add(new JoinableLayout(R.layout.trailers));
+        rvJoiner.add(new JoinableAdapter(trailerAdapter));
+        rvJoiner.add(new JoinableLayout(R.layout.reviews));
+        rvJoiner.add(new JoinableAdapter(reviewAdapter));
+        rv.setAdapter(rvJoiner.getAdapter());
+
+        View view = inflater.inflate(R.layout.movie_details, container, false);
+//        mMovieTrailerList= (RecyclerView) view.findViewById(R.id.movieTrailersList);
+//        mMovieReviewList= (RecyclerView) view.findViewById(R.id.movieReviewsList);
+        mMovieTileTxt = (TextView) view.findViewById(R.id.movieTitle);
+        mMoviePoster =  (ImageView) view.findViewById(R.id.moviePoster);
+        mMovieReleaseYear =  (TextView) view.findViewById(R.id.movieReleaseYear);
+        mMovieRating =  (TextView) view.findViewById(R.id.movieRating);
+        mMovieOverview =  (TextView) view.findViewById(R.id.movieOverview);
+        mMovieFavorite =  (ImageView) view.findViewById(R.id.favoriteIcon);
+
+        setupMovieTrailerdapter(null);
+        setupMovieReviewAdapter(null);
+
+        return viewRecycler;
     }
 
     @Override
@@ -125,11 +209,12 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "In onCreateLoader");
+
         Intent intent = getActivity().getIntent();
         if (intent == null) {
             return null;
         }
+        Log.v(LOG_TAG, "In onCreateLoader intent data is: "+intent.getData());
 
         int movieID = intent.getIntExtra(DetailsActivity.EXTRA_MOVIE, -1);
         String selectionClause = MovieContract.MovieEntry._ID + " = ?";
@@ -235,12 +320,64 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             }
         });
 
+        fetchMovieTrailersAndReviews(movieID);
+
     }
 
     private void showFavoriteIcon(ImageView image, int resoureId) {
         image.setImageResource(resoureId);
         image.setVisibility(View.VISIBLE);
     }
+
+    /**
+     * Used to fire an event to the Bus that will fetch movie list from Open Movie DB REST back-end.
+     * The sort order is retrieved from Shared Preferences
+     */
+    private void fetchMovieTrailersAndReviews(final int movieId) {
+        PopularMoviesApplication.getEventBus().post(Utility.produceMovieTrailersEvent(movieId));
+        PopularMoviesApplication.getEventBus().post(Utility.produceMovieReviewsEvent(movieId));
+    }
+
+    /**
+     * This method is triggered when we have updated the local DB with back-end results.
+     * Restart the loader.  restartLoader will trigger onCreateLoader to be called again.
+     *
+     */
+    @Subscribe
+    public void onReviewEvent(ReviewEvent movieReview) {
+        setupMovieReviewAdapter(movieReview.getmReviewList());
+    Log.d(LOG_TAG, "onReviewEvent called");
+
+        if(movieReview.getmReviewList()!=null){
+            Log.d(LOG_TAG, "# of review items: "+movieReview.getmReviewList().size());
+        }
+
+    }
+
+    /**
+     * This method is triggered when we have updated the local DB with back-end results.
+     * Restart the loader.  restartLoader will trigger onCreateLoader to be called again.
+     *
+     */
+    @Subscribe
+    public void onTrailerEvent(TrailerEvent movieTrailer) {
+        setupMovieTrailerdapter(movieTrailer.getmTrailerList());
+        Log.d(LOG_TAG, "onTrailerEvent called");
+
+        if(movieTrailer.getmTrailerList()!=null){
+            Log.d(LOG_TAG, "# of review trailers: "+movieTrailer.getmTrailerList().size());
+        }
+
+    }
+
+//    @OnItemClick(R.id.movieTrailersList)
+//    void onItemClick(View view, int position) {
+//        TextView videoKey= (TextView) view.findViewById(R.id.trailer_video_key);
+//        String youTubeUrl= Constants.YOU_TUBE_BASE_URL+videoKey.getText();
+//        Log.d(LOG_TAG, "Clicked position " + position + " YouTube video URL: "+youTubeUrl);
+//        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(youTubeUrl)));
+//
+//    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -280,6 +417,54 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
         return shareIntent;
     }
+
+    private void setupMovieReviewAdapter(final List<MovieReview> movieReviews) {
+        //if (getActivity() == null || mMovieReviewList == null) return;
+        if (getActivity() == null) return;
+
+        if (movieReviews != null ) {
+//            LinearLayoutManager layoutManager
+//                    = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+//            //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+//            mMovieReviewList.setLayoutManager(layoutManager);
+//            mMovieReviewList.setItemAnimator(new DefaultItemAnimator());
+//            mMovieReviewList.setAdapter(new MovieReviewAdapter(movieReviews));
+            //rvJoiner.add(new JoinableAdapter(new MovieReviewAdapter(movieReviews)));
+            reviewAdapter.setmMovieReviewList(movieReviews);
+            reviewAdapter.notifyDataSetChanged();
+            //rv.setAdapter(rvJoiner.getAdapter());
+            Log.d(LOG_TAG, "# of reviews in setupAdapet is: "+movieReviews.size());
+            //mMovieTrailerList.getLayoutParams().height = 270*movieReviews.size();
+            //mMovieReviewList.setAdapter(new MovieReviewAdapter( movieReviews));
+        }
+//        else {
+//            mMovieReviewList.setAdapter(null);
+//        }
+    }
+
+    private void setupMovieTrailerdapter(final List<Trailer> movieTrailers ) {
+        //if (getActivity() == null ||  mMovieTrailerList== null) return;
+        if (getActivity() == null ) return;
+
+        if (movieTrailers != null ) {
+//            LinearLayoutManager layoutManager
+//                    = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+//           // RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+//            mMovieTrailerList.setLayoutManager(layoutManager);
+//            mMovieTrailerList.setItemAnimator(new DefaultItemAnimator());
+//            mMovieTrailerList.setAdapter(new MovieTrailerAdapter(movieTrailers));
+            //rvJoiner.add(new JoinableAdapter(new MovieTrailerAdapter(movieTrailers)));
+            trailerAdapter.setmMovieTrailerList(movieTrailers);
+            trailerAdapter.notifyDataSetChanged();
+            //rv.setAdapter(rvJoiner.getAdapter());
+            Log.d(LOG_TAG, "# of trailers in setupAdapet is: "+movieTrailers.size());
+            //mMovieTrailerList.getLayoutParams().height = 270*movieTrailers.size();
+        }
+//        else {
+//            mMovieTrailerList.setAdapter(null);
+//        }
+    }
+
 
 
     private class DBUpdateTask extends AsyncTask<Void, Integer, Void> {
