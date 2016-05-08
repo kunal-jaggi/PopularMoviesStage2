@@ -72,6 +72,10 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
     private static final String LOG_TAG = DetailsFragment.class.getSimpleName();
     private static final String MOVIE_DETAILS_SHARE_HASHTAG = " #PopularMoviesApp";
+    static final String MOVIE_ID = "ID";
+    static final String DETAIL_URI = "URI";
+    private Uri mUri;
+    private int mMovieId;
 
     //@Bind(R.id.movieTitle)
     TextView mMovieTileTxt;
@@ -168,6 +172,12 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(DETAIL_URI);
+            mMovieId= arguments.getInt(MOVIE_ID);
+        }
+
         //View trailerView = inflater.inflate(R.layout.list_item_trailers, container, false);
         //mMovieTrailerList= (RecyclerView) trailerView.findViewById(R.id.movieTrailersList);
          //ButterKnife.bind(this, trailerView);
@@ -210,26 +220,30 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        Intent intent = getActivity().getIntent();
-        if (intent == null) {
-            return null;
+//        Intent intent = getActivity().getIntent();
+//        if (intent == null) {
+//            return null;
+//        }
+        if(mUri != null) {
+
+            Log.v(LOG_TAG, "In onCreateLoader intent data is: " + mUri);
+
+            //int movieID = intent.getIntExtra(DetailsActivity.EXTRA_MOVIE, -1);
+            String selectionClause = MovieContract.MovieEntry._ID + " = ?";
+            String[] selectionArgs = new String[]{"" + mMovieId};
+
+            // Now create and return a CursorLoader that will take care of
+            // creating a Cursor for the data being displayed.
+            return new CursorLoader(
+                    getActivity(),
+                    mUri,
+                    MOVIE_COLUMNS,      //projection
+                    selectionClause,    //selection
+                    selectionArgs,      //selection args
+                    null                //sort order
+            );
         }
-        Log.v(LOG_TAG, "In onCreateLoader intent data is: "+intent.getData());
-
-        int movieID = intent.getIntExtra(DetailsActivity.EXTRA_MOVIE, -1);
-        String selectionClause = MovieContract.MovieEntry._ID + " = ?";
-        String[] selectionArgs = new String[]{"" + movieID};
-
-        // Now create and return a CursorLoader that will take care of
-        // creating a Cursor for the data being displayed.
-        return new CursorLoader(
-                getActivity(),
-                intent.getData(),
-                MOVIE_COLUMNS,      //projection
-                selectionClause,    //selection
-                selectionArgs,      //selection args
-                null                //sort order
-        );
+        return null;
     }
 
     @Override

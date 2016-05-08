@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-    <ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/mainRelative"
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
 
                 <TextView
                     android:id="@+id/movieTitle"
-                    style="@style/MovieTitle" android:text="TEST" />
+                    style="@style/MovieTitle" />
             </LinearLayout>
 
             <ImageView
@@ -83,4 +83,4 @@
 
         </RelativeLayout>
     </ScrollView>
-    </LinearLayout>
+</LinearLayout>

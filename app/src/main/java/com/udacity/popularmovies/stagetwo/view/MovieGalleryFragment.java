@@ -2,6 +2,7 @@ package com.udacity.popularmovies.stagetwo.view;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -230,13 +231,16 @@ public class MovieGalleryFragment extends Fragment implements LoaderManager.Load
         Log.d(LOG_TAG, "Grid view item clicked: position: "+position+ " movie ID: "+cursor.getInt(COL_MOVIE_ID)+ " movie title: "+ cursor.getString(COL_MOVIE_TITLE)+ " poster path: "+ cursor.getString(COL_MOVIE_POSTER_PATH));
 
         if (cursor != null) {
-            String locationSetting = Utility.getPreferredSortingCriteria(getActivity());
-            Intent intent = new Intent(getActivity(), DetailsActivity.class)
-                    .setData(MovieContract.MovieEntry.buildMovieUri(
-                                    cursor.getInt(COL_MOVIE_ID)
-                            )
-                    ).putExtra(DetailsActivity.EXTRA_MOVIE, cursor.getInt(COL_MOVIE_ID));
-            startActivity(intent);
+            ((Callback) getActivity())
+                    .onItemSelected(MovieContract.MovieEntry.buildMovieUri(
+                            cursor.getInt(COL_MOVIE_ID)
+                    ), cursor.getInt(COL_MOVIE_ID));
+//            Intent intent = new Intent(getActivity(), DetailsActivity.class)
+//                    .setData(MovieContract.MovieEntry.buildMovieUri(
+//                                    cursor.getInt(COL_MOVIE_ID)
+//                            )
+//                    ).putExtra(DetailsActivity.EXTRA_MOVIE, cursor.getInt(COL_MOVIE_ID));
+//            startActivity(intent);
         }
     }
 
@@ -258,6 +262,17 @@ public class MovieGalleryFragment extends Fragment implements LoaderManager.Load
 
     }
 
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Uri dateUri, int movieID);
+    }
 
 }
 

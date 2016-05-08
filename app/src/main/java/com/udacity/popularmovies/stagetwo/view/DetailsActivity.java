@@ -29,7 +29,13 @@ public class DetailsActivity extends BaseActivity {
         // retained across a configuration change.
         if (mDetailsFragment == null) {
             mDetailsFragment = new DetailsFragment();
-            fm.beginTransaction().add(R.id.detailsContainer, mDetailsFragment, TAG_TASK_FRAGMENT).commit();
+            Bundle arguments = new Bundle();
+            //getIntExtra(DetailsActivity.EXTRA_MOVIE, -1));
+            int movieId= getIntent().getIntExtra(DetailsActivity.EXTRA_MOVIE, -1);
+            arguments.putInt(DetailsFragment.MOVIE_ID, movieId);
+            arguments.putParcelable(DetailsFragment.DETAIL_URI, getIntent().getData());
+            mDetailsFragment.setArguments(arguments);
+            fm.beginTransaction().add(R.id.movie_details_container, mDetailsFragment, TAG_TASK_FRAGMENT).commit();
         }
 
 //        if (savedInstanceState == null) {
