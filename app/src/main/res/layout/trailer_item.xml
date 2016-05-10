@@ -27,4 +27,11 @@
         android:layout_height="wrap_content"
         android:visibility="gone"></TextView>
 
+    <View
+        android:layout_width="fill_parent"
+        android:layout_marginTop="25dp"
+        android:layout_height="2dp"
+        android:background="#c0c0c0"
+        android:layout_below="@+id/trailer_item_textView"/>
+
 </RelativeLayout>

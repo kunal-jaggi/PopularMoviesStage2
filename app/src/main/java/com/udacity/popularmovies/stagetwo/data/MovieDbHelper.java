@@ -3,6 +3,7 @@ package com.udacity.popularmovies.stagetwo.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import com.udacity.popularmovies.stagetwo.data.MovieContract.MovieEntry;
 
 /**
@@ -25,6 +26,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     /**
      * Called when the database is created for the first time.
      * This is where the creation of tables and the initial population of the tables should happen.
+     *
      * @param sqLiteDatabase
      */
     @Override

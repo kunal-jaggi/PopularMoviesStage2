@@ -11,14 +11,14 @@ import com.udacity.popularmovies.stagetwo.R;
  */
 public class MovieReviewHolder extends RecyclerView.ViewHolder {
 
-private TextView mAuthor;
-private TextView mContent;
+    private TextView mAuthor;
+    private TextView mContent;
 
-public MovieReviewHolder(View view) {
+    public MovieReviewHolder(View view) {
         super(view);
         this.mAuthor = (TextView) view.findViewById(R.id.review_item_author);
         this.mContent = (TextView) view.findViewById(R.id.review_item_content);
-        }
+    }
 
     public TextView getmAuthor() {
         return mAuthor;

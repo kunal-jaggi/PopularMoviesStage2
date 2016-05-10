@@ -47,9 +47,9 @@ public class MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewHolder> 
     @Override
     public int getItemCount() {
 
-        if(mMovieReviewList==null)
+        if (mMovieReviewList == null)
             return 0;
-        else{
+        else {
             return mMovieReviewList.size();
         }
     }
@@ -62,31 +62,3 @@ public class MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewHolder> 
         this.mMovieReviewList = mMovieReviewList;
     }
 }
-
-
-//old impl
-//public class MovieReviewAdapter extends ArrayAdapter<MovieReview> {
-//    private Context mContext;
-//    private List<MovieReview> mMovieReviewList;
-//
-//    public MovieReviewAdapter(Context context, List<MovieReview> reviews) {
-//        super(context, 0, reviews);
-//        mContext = context;
-//        mMovieReviewList = reviews;
-//    }
-//
-//    @Override
-//    public View getView(int position, View convertView, ViewGroup parent) {
-//        if (convertView == null) {
-//            convertView = ((LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.review_item, parent, false);
-//        }
-//
-//        TextView author = (TextView) convertView.findViewById(R.id.review_item_author);
-//        author.setText(mMovieReviewList.get(position).getmAuthor());
-//
-//        TextView textView = (TextView) convertView.findViewById(R.id.review_item_textView);
-//        textView.setText(mMovieReviewList.get(position).getmContent());
-//
-//        return convertView;
-//    }
-//}

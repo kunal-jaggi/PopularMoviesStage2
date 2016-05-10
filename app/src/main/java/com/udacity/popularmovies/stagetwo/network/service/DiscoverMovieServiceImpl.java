@@ -52,7 +52,7 @@ public class DiscoverMovieServiceImpl {
 
     public DiscoverMovieServiceImpl(Context context) {
         PopularMoviesApplication.getEventBus().register(this);
-        this.mContext= context;
+        this.mContext = context;
     }
 
     /**
@@ -72,7 +72,7 @@ public class DiscoverMovieServiceImpl {
 
         Call<MovieInfo> restCall = api.getPopularMovies(event.getmSortBy(), Constants.MOVIE_DB_API_KEY);
 
-        Log.d(LOG_TAG, "Making REST call to fetch movies. Sort criteria: "+event.getmSortBy());
+        Log.d(LOG_TAG, "Making REST call to fetch movies. Sort criteria: " + event.getmSortBy());
         restCall.enqueue(new Callback<MovieInfo>() {
             @Override
             public void onResponse(Response<MovieInfo> response, Retrofit retrofit) {
@@ -85,13 +85,13 @@ public class DiscoverMovieServiceImpl {
                 } else {
                     //request not successful (like 400,401,403 etc)
                     //Handle errors
-                    Log.d(LOG_TAG, "Web call error. response: "+response);
+                    Log.d(LOG_TAG, "Web call error. response: " + response);
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-                Log.d(LOG_TAG, "Web call error. exception: "+toString());
+                Log.d(LOG_TAG, "Web call error. exception: " + toString());
             }
         });
     }
@@ -113,7 +113,7 @@ public class DiscoverMovieServiceImpl {
 
         Call<ReviewInfo> restCall = api.getReviews(event.getmMovieId(), Constants.MOVIE_DB_API_KEY);
 
-        Log.d(LOG_TAG, "Making REST call to fetch movie reviews. Movie ID: "+event.getmMovieId());
+        Log.d(LOG_TAG, "Making REST call to fetch movie reviews. Movie ID: " + event.getmMovieId());
         restCall.enqueue(new Callback<ReviewInfo>() {
             @Override
             public void onResponse(Response<ReviewInfo> response, Retrofit retrofit) {
@@ -121,17 +121,17 @@ public class DiscoverMovieServiceImpl {
                     // request successful (status code 200, 201)
                     ReviewInfo movieReviews = response.body();
                     PopularMoviesApplication.getEventBus().post(Utility.produceReviewEvent(movieReviews.getmReviewList()));
-                    Log.d(LOG_TAG, "Reviews Result count : "+movieReviews.getmReviewList().size());
+                    Log.d(LOG_TAG, "Reviews Result count : " + movieReviews.getmReviewList().size());
                 } else {
                     //request not successful (like 400,401,403 etc)
                     //Handle errors
-                    Log.d(LOG_TAG, "Web call error");
+                    Log.d(LOG_TAG, "Web call error while fetching movie reviews.");
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                Log.d(LOG_TAG, "Web call error to get reviews. exception: " + toString());
             }
         });
     }
@@ -153,7 +153,7 @@ public class DiscoverMovieServiceImpl {
 
         Call<TrailerInfo> restCall = api.getTrailers(event.getmMovieId(), Constants.MOVIE_DB_API_KEY);
 
-        Log.d(LOG_TAG, "Making REST call to fetch movie trailers. Movie ID: "+event.getmMovieId());
+        Log.d(LOG_TAG, "Making REST call to fetch movie trailers. Movie ID: " + event.getmMovieId());
         restCall.enqueue(new Callback<TrailerInfo>() {
             @Override
             public void onResponse(Response<TrailerInfo> response, Retrofit retrofit) {
@@ -161,39 +161,39 @@ public class DiscoverMovieServiceImpl {
                     // request successful (status code 200, 201)
                     TrailerInfo movieTrailers = response.body();
                     PopularMoviesApplication.getEventBus().post(Utility.produceTrailerEvent(movieTrailers.getmResults()));
-                    Log.d(LOG_TAG, "Trailer Result count : "+movieTrailers.getmResults());
+                    Log.d(LOG_TAG, "Trailer Result count : " + movieTrailers.getmResults());
                 } else {
                     //request not successful (like 400,401,403 etc)
                     //Handle errors
-                    Log.d(LOG_TAG, "Web call error");
+                    Log.d(LOG_TAG, "Web call error while fetching movie trailers.");
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                Log.d(LOG_TAG, "Web call error to get trailers. exception: " + toString());
             }
         });
     }
 
-    private void insertMoveRecords(final List<Movie> movieList){
+    private void insertMoveRecords(final List<Movie> movieList) {
         // Insert the new weather information into the database
         Vector<ContentValues> cVVector = new Vector<ContentValues>(movieList.size());
-        String sortCriteria= Utility.getPreferredSortingCriteria(mContext);
+        String sortCriteria = Utility.getPreferredSortingCriteria(mContext);
 
-        for(Movie movie: movieList){
+        for (Movie movie : movieList) {
 
             ContentValues movieValues = new ContentValues();
             movieValues.put(MovieContract.MovieEntry._ID, movie.getmId());
             movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, movie.getmTitle());
             movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.getmVoteAverage());
-            movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE,movie.getmReleaseDate());
+            movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getmReleaseDate());
             movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.getmOverview());
             movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movie.getmPosterPath());
 
-            if(sortCriteria.equalsIgnoreCase(mContext.getString(R.string.pref_sort_by_popular))){
+            if (sortCriteria.equalsIgnoreCase(mContext.getString(R.string.pref_sort_by_popular))) {
                 movieValues.put(MovieContract.MovieEntry.COLUMN_IS_POPULAR, 1);   // SQLite does not have a separate Boolean storage class.
-            }else if (sortCriteria.equalsIgnoreCase(mContext.getString(R.string.pref_sort_by_rating))){
+            } else if (sortCriteria.equalsIgnoreCase(mContext.getString(R.string.pref_sort_by_rating))) {
                 movieValues.put(MovieContract.MovieEntry.COLUMN_IS_RATED, 1);     // Instead, Boolean values are stored as integers 0 (false) and 1 (true).
             }
             cVVector.add(movieValues);
@@ -202,7 +202,7 @@ public class DiscoverMovieServiceImpl {
 
         int inserted = 0;
         // add to database
-        if ( cVVector.size() > 0 ) {
+        if (cVVector.size() > 0) {
             ContentValues[] cvArray = new ContentValues[cVVector.size()];
             cVVector.toArray(cvArray);
             inserted = mContext.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);

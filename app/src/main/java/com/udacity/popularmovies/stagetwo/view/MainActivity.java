@@ -13,7 +13,7 @@ import com.udacity.popularmovies.stagetwo.util.Utility;
  * Created by kunaljaggi on 2/14/16.
  */
 
-public class MainActivity extends BaseActivity implements MovieGalleryFragment.Callback{
+public class MainActivity extends BaseActivity implements MovieGalleryFragment.Callback {
 
     private final String MOVIEFRAGMENT_TAG = "MFTAG";
     private boolean mTwoPane;
@@ -36,22 +36,12 @@ public class MainActivity extends BaseActivity implements MovieGalleryFragment.C
             // fragment transaction.
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.movie_details_container, new MovieGalleryFragment(), MOVIEFRAGMENT_TAG)
+                        .replace(R.id.movie_details_container, new DetailsFragment(), MOVIEFRAGMENT_TAG)
                         .commit();
             }
         } else {
             mTwoPane = false;
         }
-
-//        if (savedInstanceState == null) {
-//            getSupportFragmentManager().beginTransaction()
-//                    .add(R.id.container, new MovieGalleryFragment(), MOVIEFRAGMENT_TAG)
-//                    .commit();
-//        }
-    }
-
-    private void checkTwoPaneView() {
-
     }
 
     @Override
@@ -60,10 +50,16 @@ public class MainActivity extends BaseActivity implements MovieGalleryFragment.C
         String sortCriteria = Utility.getPreferredSortingCriteria(this);
         // update the location in our second pane using the fragment manager
         if (sortCriteria != null && !sortCriteria.equals(mSortCriteria)) {
-            MovieGalleryFragment ff = (MovieGalleryFragment) getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
+
+            MovieGalleryFragment ff = (MovieGalleryFragment) getSupportFragmentManager().findFragmentById(R.id.movie_grid_container);
             if (null != ff) {
                 ff.onSortCriteriaChanged();
             }
+
+//            DetailsFragment df = (DetailsFragment) getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
+//            if (null != df) {
+//                df.onSortCriteriaChanged();
+//            }
             mSortCriteria = sortCriteria;
         }
     }
@@ -77,6 +73,7 @@ public class MainActivity extends BaseActivity implements MovieGalleryFragment.C
             Bundle args = new Bundle();
             args.putParcelable(DetailsFragment.DETAIL_URI, movieUri);
             args.putInt(DetailsFragment.MOVIE_ID, movieID);
+
             DetailsFragment fragment = new DetailsFragment();
             fragment.setArguments(args);
 

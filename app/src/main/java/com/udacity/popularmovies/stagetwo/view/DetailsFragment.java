@@ -77,27 +77,22 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     private Uri mUri;
     private int mMovieId;
 
-    //@Bind(R.id.movieTitle)
-    TextView mMovieTileTxt;
+    private TextView mMovieTileTxt;
     //@Bind(R.id.moviePoster)
-    ImageView mMoviePoster;
+    private ImageView mMoviePoster;
     //@Bind(R.id.movieReleaseYear)
-    TextView mMovieReleaseYear;
+    private TextView mMovieReleaseYear;
     //@Bind(R.id.movieRating)
-    TextView mMovieRating;
+    private TextView mMovieRating;
     //@Bind(R.id.movieOverview)
-    TextView mMovieOverview;
+    private TextView mMovieOverview;
     //@Bind(R.id.favoriteIcon)
-    ImageView mMovieFavorite;
-    //@Bind(R.id.movieReviews)
-   // RecyclerView mMovieReviewList;
-    //@Bind(R.id.movieTrailers)
-   // RecyclerView mMovieTrailerList;
+    private ImageView mMovieFavorite;
 
-    RecyclerView rv;
-    RvJoiner rvJoiner = new RvJoiner();
-    MovieTrailerAdapter trailerAdapter;
-    MovieReviewAdapter reviewAdapter;
+    private RecyclerView rv;
+    private RvJoiner rvJoiner = new RvJoiner();
+    private MovieTrailerAdapter trailerAdapter;
+    private MovieReviewAdapter reviewAdapter;
 
     private static final int DETAIL_LOADER = 0;
 
@@ -129,7 +124,6 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);// fragment should handle menu events.
-        setRetainInstance(true);
 
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
@@ -141,10 +135,11 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         Log.d(LOG_TAG, "onStart called");
         PopularMoviesApplication.getEventBus().register(this);
     }
+
     @Override
-    public void onPause() {
+    public void onStop() {
         super.onPause();
-        Log.d(LOG_TAG, "onPause called");
+        Log.d(LOG_TAG, "onStop called");
         PopularMoviesApplication.getEventBus().unregister(this);
     }
 
@@ -153,57 +148,49 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         super.onResume();
     }
 
-    //old implementation
-    /*
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_details, container, false);
-        ButterKnife.bind(this, view);
-
-        View reviewView = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.list_item_reviews, container, false);
-
-        mMovieReviewList = (ListView) reviewView.findViewById(R.id.movieReviews);
-        //handleListViewScrolling(mMovieReviewList);
-        setupAdapter(null);
-        return view;
-    }
-    */
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        Bundle arguments = getArguments();
+        final Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(DETAIL_URI);
-            mMovieId= arguments.getInt(MOVIE_ID);
+            mMovieId = arguments.getInt(MOVIE_ID);
         }
 
-        //View trailerView = inflater.inflate(R.layout.list_item_trailers, container, false);
-        //mMovieTrailerList= (RecyclerView) trailerView.findViewById(R.id.movieTrailersList);
-         //ButterKnife.bind(this, trailerView);
         View viewRecycler = inflater.inflate(R.layout.fragment_details, container, false);
         rv = (RecyclerView) viewRecycler.findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        trailerAdapter= new MovieTrailerAdapter(null, getContext());
-        reviewAdapter= new MovieReviewAdapter(null);
+        trailerAdapter = new MovieTrailerAdapter(null, getContext());
+        reviewAdapter = new MovieReviewAdapter(null);
 
-        rvJoiner.add(new JoinableLayout(R.layout.movie_details));
-        rvJoiner.add(new JoinableLayout(R.layout.trailers));
-        rvJoiner.add(new JoinableAdapter(trailerAdapter));
-        rvJoiner.add(new JoinableLayout(R.layout.reviews));
-        rvJoiner.add(new JoinableAdapter(reviewAdapter));
+        if (arguments == null) {
+            rvJoiner.add(new JoinableLayout(R.layout.placeholder));
+        } else {
+
+            rvJoiner.add(new JoinableLayout(R.layout.movie_details, new JoinableLayout.Callback() {
+                @Override
+                public void onInflateComplete(View view, ViewGroup parent) {
+                    mMovieTileTxt = (TextView) view.findViewById(R.id.movieTitle);
+                    mMoviePoster = (ImageView) view.findViewById(R.id.moviePoster);
+                    mMovieReleaseYear = (TextView) view.findViewById(R.id.movieReleaseYear);
+                    mMovieRating = (TextView) view.findViewById(R.id.movieRating);
+                    mMovieOverview = (TextView) view.findViewById(R.id.movieOverview);
+                    mMovieFavorite = (ImageView) view.findViewById(R.id.favoriteIcon);
+
+                    fillDetailsScreen();
+                }
+            }));
+
+            rvJoiner.add(new JoinableLayout(R.layout.trailers));
+            rvJoiner.add(new JoinableAdapter(trailerAdapter));
+            rvJoiner.add(new JoinableLayout(R.layout.reviews));
+            rvJoiner.add(new JoinableAdapter(reviewAdapter));
+        }
         rv.setAdapter(rvJoiner.getAdapter());
 
         View view = inflater.inflate(R.layout.movie_details, container, false);
-//        mMovieTrailerList= (RecyclerView) view.findViewById(R.id.movieTrailersList);
-//        mMovieReviewList= (RecyclerView) view.findViewById(R.id.movieReviewsList);
-        mMovieTileTxt = (TextView) view.findViewById(R.id.movieTitle);
-        mMoviePoster =  (ImageView) view.findViewById(R.id.moviePoster);
-        mMovieReleaseYear =  (TextView) view.findViewById(R.id.movieReleaseYear);
-        mMovieRating =  (TextView) view.findViewById(R.id.movieRating);
-        mMovieOverview =  (TextView) view.findViewById(R.id.movieOverview);
-        mMovieFavorite =  (ImageView) view.findViewById(R.id.favoriteIcon);
 
         setupMovieTrailerdapter(null);
         setupMovieReviewAdapter(null);
@@ -219,16 +206,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-//        Intent intent = getActivity().getIntent();
-//        if (intent == null) {
-//            return null;
-//        }
-        if(mUri != null) {
-
-            Log.v(LOG_TAG, "In onCreateLoader intent data is: " + mUri);
-
-            //int movieID = intent.getIntExtra(DetailsActivity.EXTRA_MOVIE, -1);
+        if (mUri != null) {
             String selectionClause = MovieContract.MovieEntry._ID + " = ?";
             String[] selectionArgs = new String[]{"" + mMovieId};
 
@@ -253,86 +231,90 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             return;
         }
 
-        fillDetailScreen(cursor);
+        movieID = cursor.getInt(COL_MOVIE_ID);
+        movieTitle = cursor.getString(COL_MOVIE_TITLE);
+        movieOverview = cursor.getString(COL_MOVIE_OVERVIEW);
+        movieVotes = cursor.getString(COL_MOVIE_VOTE_AVERAGE);
+        movieReleaseDate = cursor.getString(COL_MOVIE_RELEASE_DATE);
+        moviePosterPath = cursor.getString(COL_MOVIE_POSTER_PATH);
+        isFavorite = cursor.getInt(COL_MOVIE_IS_FAVORITE) > 0;
+
+        fillDetailsScreen();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
+    int movieID;
+    String movieTitle;
+    String movieOverview;
+    String movieVotes;
+    String movieReleaseDate;
+    String moviePosterPath;
+    boolean isFavorite;
+
     /**
      * Used to render original title, poster image, overview (plot), user rating and release date.
      */
-    private void fillDetailScreen(Cursor data) {
-        final int movieID = data.getInt(COL_MOVIE_ID);
-        String movieTitle = data.getString(COL_MOVIE_TITLE);
-        String movieOverview = data.getString(COL_MOVIE_OVERVIEW);
-        String movieVotes = data.getString(COL_MOVIE_VOTE_AVERAGE);
-        String movieReleaseDate = data.getString(COL_MOVIE_RELEASE_DATE);
-        String moviePosterPath = data.getString(COL_MOVIE_POSTER_PATH);
-        final boolean isFavorite = data.getInt(COL_MOVIE_IS_FAVORITE) > 0;
+    private void fillDetailsScreen() {
 
-        mMovieTileTxt.setText(movieTitle);
-        Picasso.with(getContext())
-                .load(Constants.MOVIE_DB_POSTER_URL + Constants.POSTER_PHONE_SIZE + moviePosterPath)
-                .placeholder(R.drawable.poster_placeholder) // support download placeholder
-                .error(R.drawable.poster_placeholder_error) //support error placeholder, if back-end returns empty string or null
-                .into(mMoviePoster);
+        if (mMovieTileTxt != null) {
+            mMovieTileTxt.setText(movieTitle);
+        }
+
+        if (mMoviePoster != null) {
+            Picasso.with(getContext())
+                    .load(Constants.MOVIE_DB_POSTER_URL + Constants.POSTER_PHONE_SIZE + moviePosterPath)
+                    .placeholder(R.drawable.poster_placeholder) // support download placeholder
+                    .error(R.drawable.poster_placeholder_error) //support error placeholder, if back-end returns empty string or null
+                    .into(mMoviePoster);
+        }
 
         //we only want to display ratings rounded up to 3 chars max (e.g. 6.3)
         if (movieVotes != null && movieVotes.length() >= 3) {
             movieVotes = movieVotes.substring(0, 3);
         }
-        mMovieRating.setText("" + movieVotes + "/10");
-        mMovieOverview.setText(movieOverview);
-
-        // Movie DB API returns release date in yyyy--mm-dd format
-        // Extract the year through regex
-        Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2})");
-        Matcher dateMatcher = datePattern.matcher(movieReleaseDate);
-        if (dateMatcher.find()) {
-            movieReleaseDate = dateMatcher.group(1);
-
-        }
-        mMovieReleaseYear.setText(movieReleaseDate);
-
-        if (isFavorite) {
-            showFavoriteIcon(mMovieFavorite, R.drawable.ic_favorite_black_24dp);
-        } else {
-            showFavoriteIcon(mMovieFavorite, R.drawable.ic_favorite_border_black_24dp);
+        if (mMovieRating != null) {
+            mMovieRating.setText("" + movieVotes + "/10");
         }
 
+        if (mMovieOverview != null) {
+            mMovieOverview.setText(movieOverview);
+        }
 
-        mMovieFavorite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Create and execute the background task.
-                DBUpdateTask task = new DBUpdateTask(isFavorite, movieID);
-                task.execute();
-
-//                ContentValues updateValues = new ContentValues();
-//                if (isFavorite) {
-//                    updateValues.put(MovieContract.MovieEntry.COLUMN_IS_FAVORITE, 0);
-//                } else {
-//                    updateValues.put(MovieContract.MovieEntry.COLUMN_IS_FAVORITE, 1);
-//                }
-//
-//                // Defines selection criteria for the rows you want to update
-//                String selectionClause = MovieContract.MovieEntry._ID + " = ?";
-//                String[] selectionArgs = new String[]{"" + movieID};
-//
-//                // Defines a variable to contain the number of updated rows
-//                int rowsUpdated = 0;
-//
-//
-//                rowsUpdated = getContext().getContentResolver().update(
-//                        MovieContract.MovieEntry.CONTENT_URI,  // the user dictionary content URI
-//                        updateValues,                       // the columns to update
-//                        selectionClause,                    // the column to select on
-//                        selectionArgs);                      // the value to compare to
+        if (movieReleaseDate != null) {
+            // Movie DB API returns release date in yyyy--mm-dd format
+            // Extract the year through regex
+            Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2})");
+            Matcher dateMatcher = datePattern.matcher(movieReleaseDate);
+            if (dateMatcher.find()) {
+                movieReleaseDate = dateMatcher.group(1);
 
             }
-        });
+        }
+
+        if (mMovieReleaseYear != null) {
+            mMovieReleaseYear.setText(movieReleaseDate);
+        }
+
+        if (mMovieFavorite != null) {
+            if (isFavorite) {
+                showFavoriteIcon(mMovieFavorite, R.drawable.ic_favorite_black_24dp);
+            } else {
+                showFavoriteIcon(mMovieFavorite, R.drawable.ic_favorite_border_black_24dp);
+            }
+
+
+            mMovieFavorite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Create and execute the background task.
+                    DBUpdateTask task = new DBUpdateTask(isFavorite, movieID);
+                    task.execute();
+                }
+            });
+        }
 
         fetchMovieTrailersAndReviews(movieID);
 
@@ -355,15 +337,14 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     /**
      * This method is triggered when we have updated the local DB with back-end results.
      * Restart the loader.  restartLoader will trigger onCreateLoader to be called again.
-     *
      */
     @Subscribe
     public void onReviewEvent(ReviewEvent movieReview) {
         setupMovieReviewAdapter(movieReview.getmReviewList());
-    Log.d(LOG_TAG, "onReviewEvent called");
+        Log.d(LOG_TAG, "onReviewEvent  called");
 
-        if(movieReview.getmReviewList()!=null){
-            Log.d(LOG_TAG, "# of review items: "+movieReview.getmReviewList().size());
+        if (movieReview.getmReviewList() != null) {
+            Log.d(LOG_TAG, "# of review items: " + movieReview.getmReviewList().size());
         }
 
     }
@@ -371,27 +352,17 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     /**
      * This method is triggered when we have updated the local DB with back-end results.
      * Restart the loader.  restartLoader will trigger onCreateLoader to be called again.
-     *
      */
     @Subscribe
     public void onTrailerEvent(TrailerEvent movieTrailer) {
         setupMovieTrailerdapter(movieTrailer.getmTrailerList());
         Log.d(LOG_TAG, "onTrailerEvent called");
 
-        if(movieTrailer.getmTrailerList()!=null){
-            Log.d(LOG_TAG, "# of review trailers: "+movieTrailer.getmTrailerList().size());
+        if (movieTrailer.getmTrailerList() != null) {
+            Log.d(LOG_TAG, "# of review trailers: " + movieTrailer.getmTrailerList().size());
         }
 
     }
-
-//    @OnItemClick(R.id.movieTrailersList)
-//    void onItemClick(View view, int position) {
-//        TextView videoKey= (TextView) view.findViewById(R.id.trailer_video_key);
-//        String youTubeUrl= Constants.YOU_TUBE_BASE_URL+videoKey.getText();
-//        Log.d(LOG_TAG, "Clicked position " + position + " YouTube video URL: "+youTubeUrl);
-//        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(youTubeUrl)));
-//
-//    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -436,59 +407,34 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         //if (getActivity() == null || mMovieReviewList == null) return;
         if (getActivity() == null) return;
 
-        if (movieReviews != null ) {
-//            LinearLayoutManager layoutManager
-//                    = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-//            //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
-//            mMovieReviewList.setLayoutManager(layoutManager);
-//            mMovieReviewList.setItemAnimator(new DefaultItemAnimator());
-//            mMovieReviewList.setAdapter(new MovieReviewAdapter(movieReviews));
-            //rvJoiner.add(new JoinableAdapter(new MovieReviewAdapter(movieReviews)));
+        if (movieReviews != null) {
             reviewAdapter.setmMovieReviewList(movieReviews);
             reviewAdapter.notifyDataSetChanged();
-            //rv.setAdapter(rvJoiner.getAdapter());
-            Log.d(LOG_TAG, "# of reviews in setupAdapet is: "+movieReviews.size());
-            //mMovieTrailerList.getLayoutParams().height = 270*movieReviews.size();
-            //mMovieReviewList.setAdapter(new MovieReviewAdapter( movieReviews));
+            Log.d(LOG_TAG, "# of reviews in setupAdapet is: " + movieReviews.size());
         }
-//        else {
-//            mMovieReviewList.setAdapter(null);
-//        }
     }
 
-    private void setupMovieTrailerdapter(final List<Trailer> movieTrailers ) {
-        //if (getActivity() == null ||  mMovieTrailerList== null) return;
-        if (getActivity() == null ) return;
+    private void setupMovieTrailerdapter(final List<Trailer> movieTrailers) {
+        if (getActivity() == null) return;
 
-        if (movieTrailers != null ) {
-//            LinearLayoutManager layoutManager
-//                    = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-//           // RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
-//            mMovieTrailerList.setLayoutManager(layoutManager);
-//            mMovieTrailerList.setItemAnimator(new DefaultItemAnimator());
-//            mMovieTrailerList.setAdapter(new MovieTrailerAdapter(movieTrailers));
-            //rvJoiner.add(new JoinableAdapter(new MovieTrailerAdapter(movieTrailers)));
+        if (movieTrailers != null) {
             trailerAdapter.setmMovieTrailerList(movieTrailers);
             trailerAdapter.notifyDataSetChanged();
-            //rv.setAdapter(rvJoiner.getAdapter());
-            Log.d(LOG_TAG, "# of trailers in setupAdapet is: "+movieTrailers.size());
-            //mMovieTrailerList.getLayoutParams().height = 270*movieTrailers.size();
         }
-//        else {
-//            mMovieTrailerList.setAdapter(null);
-//        }
     }
 
 
-
+    /**
+     * Used to insert a record into SQLite DB in a non-UI worker thread.
+     */
     private class DBUpdateTask extends AsyncTask<Void, Integer, Void> {
 
         boolean mIsFavorite;
         int movieID;
 
-        DBUpdateTask(boolean mIsFavorite, int movieID){
-            this.mIsFavorite= mIsFavorite;
-            this.movieID= movieID;
+        DBUpdateTask(boolean mIsFavorite, int movieID) {
+            this.mIsFavorite = mIsFavorite;
+            this.movieID = movieID;
         }
 
 

@@ -45,7 +45,8 @@ public class MovieGalleryFragment extends Fragment implements LoaderManager.Load
 
     private static final String LOG_TAG = MovieGalleryFragment.class.getSimpleName();
 
-    @Bind(R.id.moviesGrid) GridView mMovieGrid;
+    @Bind(R.id.moviesGrid)
+    GridView mMovieGrid;
     private DiscoverMovieServiceImpl mMovieService;
     private GalleryItemAdapter mFavoriteMovieAdapter;
     private static final int MOVIE_LOADER_ID = 0;
@@ -209,9 +210,9 @@ public class MovieGalleryFragment extends Fragment implements LoaderManager.Load
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        Log.d(LOG_TAG, "onPause called");
+    public void onStop() {
+        super.onStop();
+        Log.d(LOG_TAG, "onStop called");
         PopularMoviesApplication.getEventBus().unregister(this);
     }
 
@@ -228,26 +229,19 @@ public class MovieGalleryFragment extends Fragment implements LoaderManager.Load
         // if it cannot seek to that position.
         Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
 
-        Log.d(LOG_TAG, "Grid view item clicked: position: "+position+ " movie ID: "+cursor.getInt(COL_MOVIE_ID)+ " movie title: "+ cursor.getString(COL_MOVIE_TITLE)+ " poster path: "+ cursor.getString(COL_MOVIE_POSTER_PATH));
+        Log.d(LOG_TAG, "Grid view item clicked: position: " + position + " movie ID: " + cursor.getInt(COL_MOVIE_ID) + " movie title: " + cursor.getString(COL_MOVIE_TITLE) + " poster path: " + cursor.getString(COL_MOVIE_POSTER_PATH));
 
         if (cursor != null) {
             ((Callback) getActivity())
                     .onItemSelected(MovieContract.MovieEntry.buildMovieUri(
                             cursor.getInt(COL_MOVIE_ID)
                     ), cursor.getInt(COL_MOVIE_ID));
-//            Intent intent = new Intent(getActivity(), DetailsActivity.class)
-//                    .setData(MovieContract.MovieEntry.buildMovieUri(
-//                                    cursor.getInt(COL_MOVIE_ID)
-//                            )
-//                    ).putExtra(DetailsActivity.EXTRA_MOVIE, cursor.getInt(COL_MOVIE_ID));
-//            startActivity(intent);
         }
     }
 
     /**
      * This method is triggered when we have updated the local DB with back-end results.
      * Restart the loader.  restartLoader will trigger onCreateLoader to be called again.
-     *
      */
     @Subscribe
     public void onMovieEvent(MovieEvent movieEvent) {

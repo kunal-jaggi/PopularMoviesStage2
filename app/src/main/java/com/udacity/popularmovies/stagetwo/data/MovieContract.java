@@ -14,7 +14,7 @@ import java.util.List;
  * This class defines table and column names for the movie database.
  * This class defines all publicly available elements, like the authority,
  * the content URIs of our tables, the columns, the content types.
- *
+ * <p/>
  * Created by kunaljaggi on 4/6/16.
  */
 
@@ -31,10 +31,8 @@ public class MovieContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     // Possible paths (appended to base content URI for possible URI's)
-    // For instance, content://com.example.android.sunshine.app/weather/ is a valid path for
-    // looking at weather data. content://com.example.android.sunshine.app/givemeroot/ will fail,
-    // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
-    // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
+    // For instance, content://com.udacity.popularmovies.stagetwo/movie/ is a valid path for
+    // looking at movie data.
     public static final String PATH_MOVIE = "movie";
 
 
@@ -61,6 +59,7 @@ public class MovieContract {
         /**
          * This should form a URI Query:
          * CONTENT://com.udacity.popularmovies.stagetwo/movie/[id]
+         *
          * @param id
          * @return
          */

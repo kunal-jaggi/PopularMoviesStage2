@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 
 import com.udacity.popularmovies.stagetwo.R;
 
@@ -36,13 +37,11 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(this);
 
-//TODO I had to comment this to make things work, investigate later
-        // Trigger the listener immediately with the preference's
-        // current value.
-//        onPreferenceChange(preference,
-//                PreferenceManager
-//                        .getDefaultSharedPreferences(preference.getContext())
-//                        .getString(preference.getKey(), ""));
+        // Trigger the listener immediately with the preference's current value.
+        onPreferenceChange(preference,
+                PreferenceManager
+                        .getDefaultSharedPreferences(preference.getContext())
+                        .getString(preference.getKey(), ""));
     }
 
     /**

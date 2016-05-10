@@ -14,7 +14,6 @@ public class DetailsActivity extends BaseActivity {
     public static final String EXTRA_MOVIE = "com.udacity.popularmovies.EXTRA_MOVIE";
 
     private static final String TAG_TASK_FRAGMENT = "task_fragment";
-
     private DetailsFragment mDetailsFragment;
 
     @Override
@@ -30,19 +29,13 @@ public class DetailsActivity extends BaseActivity {
         if (mDetailsFragment == null) {
             mDetailsFragment = new DetailsFragment();
             Bundle arguments = new Bundle();
-            //getIntExtra(DetailsActivity.EXTRA_MOVIE, -1));
-            int movieId= getIntent().getIntExtra(DetailsActivity.EXTRA_MOVIE, -1);
+            int movieId = getIntent().getIntExtra(DetailsActivity.EXTRA_MOVIE, -1);
             arguments.putInt(DetailsFragment.MOVIE_ID, movieId);
             arguments.putParcelable(DetailsFragment.DETAIL_URI, getIntent().getData());
             mDetailsFragment.setArguments(arguments);
             fm.beginTransaction().add(R.id.movie_details_container, mDetailsFragment, TAG_TASK_FRAGMENT).commit();
         }
 
-//        if (savedInstanceState == null) {
-//            getSupportFragmentManager().beginTransaction()
-//                    .add(R.id.detailsContainer, new DetailsFragment())
-//                    .commit();
-//        }
     }
 
 }

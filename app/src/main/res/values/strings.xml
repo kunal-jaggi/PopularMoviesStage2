@@ -38,5 +38,11 @@
     <!-- Value in SharedPreferences for most rated/voted  movie discover option [CHAR LIMIT=NONE] -->
     <string name="pref_sort_by_favorite" translatable="false">favorite</string>
 
+    <string name="txt_movie_details_placeholder">Select a movie on left to view its details.</string>
+
+    <string name="txt_trailers">Trailers</string>
+
+    <string name="txt_reviews">Reviews</string>
+
 
 </resources>

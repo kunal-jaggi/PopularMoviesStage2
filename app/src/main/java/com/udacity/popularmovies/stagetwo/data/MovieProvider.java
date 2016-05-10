@@ -1,15 +1,14 @@
 package com.udacity.popularmovies.stagetwo.data;
 
 
-
-        import android.annotation.TargetApi;
-        import android.content.ContentProvider;
-        import android.content.ContentValues;
-        import android.content.UriMatcher;
-        import android.database.Cursor;
-        import android.database.sqlite.SQLiteDatabase;
-        import android.database.sqlite.SQLiteQueryBuilder;
-        import android.net.Uri;
+import android.annotation.TargetApi;
+import android.content.ContentProvider;
+import android.content.ContentValues;
+import android.content.UriMatcher;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
+import android.net.Uri;
 
 /**
  * Created by kunaljaggi on 4/9/16.
@@ -21,22 +20,22 @@ public class MovieProvider extends ContentProvider {
     private MovieDbHelper mOpenHelper;
 
     static final int MOVIE = 100;
-    static final int MOVIE_WITH_ID= 101;
+    static final int MOVIE_WITH_ID = 101;
 
     private static final SQLiteQueryBuilder sMovieQueryBuilder;
 
-    static{
+    static {
         sMovieQueryBuilder = new SQLiteQueryBuilder();
 
         //This is an inner join which looks like
         //weather INNER JOIN location ON weather.location_id = location._id
         sMovieQueryBuilder.setTables(
-                MovieContract.MovieEntry.TABLE_NAME );
+                MovieContract.MovieEntry.TABLE_NAME);
     }
 
 
     private Cursor getMovie(
-            Uri uri, String[] projection,  String selection, String[] selectionArgs, String groupBy, String having, String sortOrder) {
+            Uri uri, String[] projection, String selection, String[] selectionArgs, String groupBy, String having, String sortOrder) {
         return sMovieQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
@@ -72,6 +71,7 @@ public class MovieProvider extends ContentProvider {
 
     /**
      * Initializes content provider on startup.
+     *
      * @return
      */
     @Override
@@ -82,6 +82,7 @@ public class MovieProvider extends ContentProvider {
 
     /**
      * Returns the MIME type for this URI.
+     *
      * @param uri
      * @return
      */
@@ -141,7 +142,7 @@ public class MovieProvider extends ContentProvider {
             case MOVIE: {
                 // normalizeDate(values);
                 long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
-                if ( _id > 0 )
+                if (_id > 0)
                     returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);

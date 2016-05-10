@@ -27,7 +27,7 @@ public class MovieTrailerAdapter extends RecyclerView.Adapter<MovieTrailerHolder
 
     public MovieTrailerAdapter(List<Trailer> trailers, Context context) {
         mMovieTrailerList = trailers;
-        this.mContext= context;
+        this.mContext = context;
     }
 
     @Override
@@ -47,9 +47,9 @@ public class MovieTrailerAdapter extends RecyclerView.Adapter<MovieTrailerHolder
 
     @Override
     public int getItemCount() {
-        if(mMovieTrailerList==null){
+        if (mMovieTrailerList == null) {
             return 0;
-        }else
+        } else
             return mMovieTrailerList.size();
     }
 
@@ -61,31 +61,3 @@ public class MovieTrailerAdapter extends RecyclerView.Adapter<MovieTrailerHolder
         this.mMovieTrailerList = mMovieTrailerList;
     }
 }
-
-
-//old impl
-
-//public class MovieTrailerAdapter extends ArrayAdapter<Trailer> {
-//    private Context mContext;
-//    private List<Trailer> mMovieTrailerList;
-//
-//    public MovieTrailerAdapter(Context context, List<Trailer> trailers) {
-//        super(context, 0, trailers);
-//        mContext = context;
-//        mMovieTrailerList = trailers;
-//    }
-//
-//    @Override
-//    public View getView(int position, View convertView, ViewGroup parent) {
-//        if (convertView == null) {
-//            convertView = ((LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.trailer_item, parent, false);
-//        }
-//        TextView videoTitle = (TextView) convertView.findViewById(R.id.trailer_item_textView);
-//        videoTitle.setText(mMovieTrailerList.get(position).getmName());
-//
-//        TextView videoKey = (TextView) convertView.findViewById(R.id.trailer_video_key);
-//        videoKey.setText(mMovieTrailerList.get(position).getmKey());
-//
-//        return convertView;
-//    }
-//}

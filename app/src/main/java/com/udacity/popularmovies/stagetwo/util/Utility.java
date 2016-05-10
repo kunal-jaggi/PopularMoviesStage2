@@ -27,6 +27,7 @@ public class Utility {
                 context.getString(R.string.pref_sort_order_default));
 
     }
+
     public static DiscoverMovieEvent produceDiscoverMovieEvent(String queryParam) {
         return new DiscoverMovieEvent(queryParam);
     }
