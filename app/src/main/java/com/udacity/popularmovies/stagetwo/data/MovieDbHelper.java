@@ -3,6 +3,7 @@ package com.udacity.popularmovies.stagetwo.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import com.udacity.popularmovies.stagetwo.data.MovieContract.MovieEntry;
 
 /**
@@ -25,17 +26,22 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     /**
      * Called when the database is created for the first time.
      * This is where the creation of tables and the initial population of the tables should happen.
+     *
      * @param sqLiteDatabase
      */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        //for offline access the table should have following fields title, poster, synopsis, user rating, release date
         final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
-                MovieEntry._ID + " INTEGER PRIMARY KEY," +
+                MovieEntry._ID + " INTEGER PRIMARY KEY ON CONFLICT IGNORE," + // For the INSERT and UPDATE commands, the keywords "ON CONFLICT" are replaced by "OR", this is to avoid unique constraint exception
                 MovieEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_OVERVIEW + " TEXT, " +
                 MovieEntry.COLUMN_VOTE_AVERAGE + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL ); ";
+                MovieEntry.COLUMN_RELEASE_DATE + " TEXT, " +
+                MovieEntry.COLUMN_POSTER_PATH + " TEXT, " +
+                MovieEntry.COLUMN_IS_POPULAR + " INTEGER, " +    // SQLite does not have a separate Boolean storage class.
+                MovieEntry.COLUMN_IS_RATED + " INTEGER, " +     // Instead, Boolean values are stored as integers 0 (false) and 1 (true).
+                MovieEntry.COLUMN_IS_FAVORITE + " INTEGER ); ";
+
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
     }

@@ -1,15 +1,14 @@
 package com.udacity.popularmovies.stagetwo.data;
 
 
-
-        import android.annotation.TargetApi;
-        import android.content.ContentProvider;
-        import android.content.ContentValues;
-        import android.content.UriMatcher;
-        import android.database.Cursor;
-        import android.database.sqlite.SQLiteDatabase;
-        import android.database.sqlite.SQLiteQueryBuilder;
-        import android.net.Uri;
+import android.annotation.TargetApi;
+import android.content.ContentProvider;
+import android.content.ContentValues;
+import android.content.UriMatcher;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
+import android.net.Uri;
 
 /**
  * Created by kunaljaggi on 4/9/16.
@@ -21,21 +20,22 @@ public class MovieProvider extends ContentProvider {
     private MovieDbHelper mOpenHelper;
 
     static final int MOVIE = 100;
+    static final int MOVIE_WITH_ID = 101;
 
     private static final SQLiteQueryBuilder sMovieQueryBuilder;
 
-    static{
+    static {
         sMovieQueryBuilder = new SQLiteQueryBuilder();
 
         //This is an inner join which looks like
         //weather INNER JOIN location ON weather.location_id = location._id
         sMovieQueryBuilder.setTables(
-                MovieContract.MovieEntry.TABLE_NAME );
+                MovieContract.MovieEntry.TABLE_NAME);
     }
 
 
     private Cursor getMovie(
-            Uri uri, String[] projection,  String selection, String[] selectionArgs, String groupBy, String having, String sortOrder) {
+            Uri uri, String[] projection, String selection, String[] selectionArgs, String groupBy, String having, String sortOrder) {
         return sMovieQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
@@ -64,12 +64,14 @@ public class MovieProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIE);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/*", MOVIE_WITH_ID);
 
         return matcher;
     }
 
     /**
      * Initializes content provider on startup.
+     *
      * @return
      */
     @Override
@@ -80,6 +82,7 @@ public class MovieProvider extends ContentProvider {
 
     /**
      * Returns the MIME type for this URI.
+     *
      * @param uri
      * @return
      */
@@ -90,10 +93,10 @@ public class MovieProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
-            // Student: Uncomment and fill out these two cases
-//            case WEATHER_WITH_LOCATION_AND_DATE:
-//            case WEATHER_WITH_LOCATION:
             case MOVIE:
+                return MovieContract.MovieEntry.CONTENT_TYPE;
+
+            case MOVIE_WITH_ID:
                 return MovieContract.MovieEntry.CONTENT_TYPE;
 
             default:
@@ -109,8 +112,12 @@ public class MovieProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
 
-            // "weather"
             case MOVIE: {
+                retCursor = getMovie(uri, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            }
+
+            case MOVIE_WITH_ID: {
                 retCursor = getMovie(uri, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             }
@@ -135,7 +142,7 @@ public class MovieProvider extends ContentProvider {
             case MOVIE: {
                 // normalizeDate(values);
                 long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
-                if ( _id > 0 )
+                if (_id > 0)
                     returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
@@ -168,9 +175,24 @@ public class MovieProvider extends ContentProvider {
     @Override
     public int update(
             Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        // Student: This is a lot like the delete function.  We return the number of rows impacted
-        // by the update.
-        return 0;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        int rowsUpdated;
+
+        switch (match) {
+            case MOVIE:
+                rowsUpdated = db.update(MovieContract.MovieEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsUpdated;
+
     }
 
     @Override
@@ -183,7 +205,6 @@ public class MovieProvider extends ContentProvider {
                 int returnCount = 0;
                 try {
                     for (ContentValues value : values) {
-                        // normalizeDate(value);
                         long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;

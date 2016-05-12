@@ -1,7 +1,9 @@
 package com.udacity.popularmovies.stagetwo.event;
 
 import com.udacity.popularmovies.stagetwo.network.model.Movie;
+import com.udacity.popularmovies.stagetwo.network.model.MovieReview;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,20 +12,9 @@ import java.util.List;
  */
 public class MovieEvent {
 
-    List<Movie> mMovieList;
 
     public MovieEvent() {
     }
 
-    public MovieEvent(List<Movie> mMovieList) {
-        this.mMovieList = mMovieList;
-    }
 
-    public List<Movie> getmMovieList() {
-        return mMovieList;
-    }
-
-    public void setmMovieList(List<Movie> mMovieList) {
-        this.mMovieList = mMovieList;
-    }
 }

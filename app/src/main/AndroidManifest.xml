@@ -27,7 +27,7 @@
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.udacity.popularmovies.stagetwo.view.MainActivity" />
+                android:value=".view.MainActivity" />
         </activity>
 
         <activity
@@ -40,19 +40,9 @@
                 android:value=".view.MainActivity" />
         </activity>
 
-        <activity
-            android:name=".view.FavoriteActivity"
-            android:label="@string/title_activity_favorite"
-            android:parentActivityName=".view.SettingsActivity">
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".view.SettingsActivity" />
-        </activity>
-
         <provider
-            android:authorities="com.udacity.popularmovies.stagetwo"
-            android:name=".data.MovieProvider" />
+            android:name=".data.MovieProvider"
+            android:authorities="com.udacity.popularmovies.stagetwo" />
 
     </application>
 
