@@ -44,5 +44,10 @@
 
     <string name="txt_reviews">Reviews</string>
 
+    <string name="img_movie_poster_desc">Poster</string>
+
+    <string name="img_movie_favorite_desc">Favorite</string>
+
+    <string name="img_play_desc">Play</string>
 
 </resources>

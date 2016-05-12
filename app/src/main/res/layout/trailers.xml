@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="10dp"
-        android:layout_toRightOf="@id/moviePoster"
         android:text="@string/txt_trailers"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
