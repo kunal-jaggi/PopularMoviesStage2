@@ -39,6 +39,7 @@ This project demonstartes the use of following libraries:
 5. [Recycler View] (http://developer.android.com/training/material/lists-cards.html)- an advanced and flexible version of ListView
 6. [Recycler View Joiner] (https://github.com/j2esu/rv-joiner)- a library to join multiple Recycler Views
 7. [Stetho] (http://facebook.github.io/stetho/)- adebug bridge for Android applications.
+
 ### Support
 
 If you've found an error in this project, please file an issue:
