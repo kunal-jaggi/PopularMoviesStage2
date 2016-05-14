@@ -4,6 +4,7 @@ Stage 2 of Popular Movies app required to complete Udacity Android Developer Nan
 
 ### User Experience
 In addition to Stage 1, the Stage 2 project adds the following UI enhancements:
+
 1. Movie Details layout contains a section for displaying trailer videos and user reviews (screenshot 1)
 2. In the movies detail screen, a user can tap a button(for example, a star) to mark it as a Favorite (screenshot 2)
 3. When a trailer is selected, app uses an Intent to launch the trailer (screenshot 3)
