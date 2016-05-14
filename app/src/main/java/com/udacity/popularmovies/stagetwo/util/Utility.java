@@ -13,7 +13,6 @@ import com.udacity.popularmovies.stagetwo.event.ReviewEvent;
 import com.udacity.popularmovies.stagetwo.event.TrailerEvent;
 import com.udacity.popularmovies.stagetwo.network.model.MovieReview;
 import com.udacity.popularmovies.stagetwo.network.model.Trailer;
-import com.udacity.popularmovies.stagetwo.network.model.TrailerInfo;
 
 import java.util.List;
 

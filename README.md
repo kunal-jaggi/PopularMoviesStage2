@@ -1,13 +1,13 @@
-# Popular Movies App, Stage 1
+# Popular Movies App, Stage 2
 
 Stage 2 of Popular Movies app required to complete Udacity Android Developer Nanodegree. 
 
 ### User Experience
-
-1. Upon launch, present movie posters in a Grid view (screenshot 1)
-2. Allow user to change sort criteria through Settings menu (screenshot 2)
-3. Allow user to navigate to view movie details (screenshot 3)
-4. Allow user to share a movie with another app (screenshot 4)
+In addition to Stage 1, the Stage 2 project adds the following UI enhancements:
+1. Movie Details layout contains a section for displaying trailer videos and user reviews (screenshot 1)
+2. In the movies detail screen, a user can tap a button(for example, a star) to mark it as a Favorite (screenshot 2)
+3. When a trailer is selected, app uses an Intent to launch the trailer (screenshot 3)
+4. Tablet UI uses a Master-Detail layout implemented using fragments. The left fragment is for discovering movies. The right fragment displays the movie details view for the currently selected movie (screenshot 4)
 
 ### Screenshots
 
@@ -35,7 +35,9 @@ This project demonstartes the use of following libraries:
 2. [Butterknife](http://jakewharton.github.io/butterknife/)- used for view injection
 3. [Otto](http://square.github.io/otto/)- an event bus
 4. [Picasso](http://square.github.io/picasso/)- an image loading and caching library
-
+5. [Recycler View] (http://developer.android.com/training/material/lists-cards.html)- an advanced and flexible version of ListView
+6. [Recycler View Joiner] (https://github.com/j2esu/rv-joiner)- a library to join multiple Recycler Views
+7. [Stetho] (http://facebook.github.io/stetho/)- adebug bridge for Android applications.
 ### Support
 
 If you've found an error in this project, please file an issue:

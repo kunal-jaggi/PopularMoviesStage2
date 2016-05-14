@@ -1,10 +1,9 @@
 package com.udacity.popularmovies.stagetwo.view;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -23,13 +22,9 @@ import com.udacity.popularmovies.stagetwo.R;
 import com.udacity.popularmovies.stagetwo.adapter.GalleryItemAdapter;
 import com.udacity.popularmovies.stagetwo.data.MovieContract;
 import com.udacity.popularmovies.stagetwo.event.MovieEvent;
-import com.udacity.popularmovies.stagetwo.network.model.Movie;
 import com.udacity.popularmovies.stagetwo.network.service.DiscoverMovieServiceImpl;
 import com.udacity.popularmovies.stagetwo.singleton.PopularMoviesApplication;
 import com.udacity.popularmovies.stagetwo.util.Utility;
-
-
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -250,8 +245,12 @@ public class MovieGalleryFragment extends Fragment implements LoaderManager.Load
 
 
     void onSortCriteriaChanged() {
+        //make a web call if the user selected popular or highly rated
         if (!Utility.getPreferredSortingCriteria(getContext()).equalsIgnoreCase(getResources().getString(R.string.pref_sort_by_favorite))) {
             fetchMovies();
+        } else {
+            //if the user selected favorites, just show movies in the local DB
+            getLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
         }
 
     }

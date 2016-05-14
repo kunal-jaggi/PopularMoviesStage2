@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-
 import com.squareup.picasso.Picasso;
 import com.udacity.popularmovies.stagetwo.R;
 import com.udacity.popularmovies.stagetwo.data.MovieContract;

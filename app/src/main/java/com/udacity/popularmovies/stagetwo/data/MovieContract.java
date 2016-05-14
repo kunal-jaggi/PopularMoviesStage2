@@ -5,11 +5,6 @@ import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-import com.google.gson.annotations.SerializedName;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This class defines table and column names for the movie database.
  * This class defines all publicly available elements, like the authority,

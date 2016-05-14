@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.udacity.popularmovies.stagetwo.R;
 import com.udacity.popularmovies.stagetwo.util.Constants;
