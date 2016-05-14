@@ -44,4 +44,4 @@ This project demonstartes the use of following libraries:
 
 If you've found an error in this project, please file an issue:
 
-https://github.com/kunal-jaggi/PopularMoviesStage1/issues
+https://github.com/kunal-jaggi/PopularMoviesStage2/issues
