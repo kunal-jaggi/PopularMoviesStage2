@@ -1,7 +1,6 @@
 package com.udacity.popularmovies.stagetwo.view;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -12,26 +11,18 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ShareActionProvider;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
@@ -39,27 +30,18 @@ import com.udacity.popularmovies.stagetwo.R;
 import com.udacity.popularmovies.stagetwo.adapter.MovieReviewAdapter;
 import com.udacity.popularmovies.stagetwo.adapter.MovieTrailerAdapter;
 import com.udacity.popularmovies.stagetwo.data.MovieContract;
-import com.udacity.popularmovies.stagetwo.event.MovieEvent;
 import com.udacity.popularmovies.stagetwo.event.ReviewEvent;
 import com.udacity.popularmovies.stagetwo.event.TrailerEvent;
-import com.udacity.popularmovies.stagetwo.network.model.Movie;
 import com.udacity.popularmovies.stagetwo.network.model.MovieReview;
 import com.udacity.popularmovies.stagetwo.network.model.Trailer;
-import com.udacity.popularmovies.stagetwo.network.service.DiscoverMovieServiceImpl;
 import com.udacity.popularmovies.stagetwo.singleton.PopularMoviesApplication;
 import com.udacity.popularmovies.stagetwo.util.Constants;
 import com.udacity.popularmovies.stagetwo.util.Utility;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.OnItemClick;
 import su.j2e.rvjoiner.JoinableAdapter;
 import su.j2e.rvjoiner.JoinableLayout;
 import su.j2e.rvjoiner.RvJoiner;
@@ -78,21 +60,24 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     private int mMovieId;
 
     private TextView mMovieTileTxt;
-    //@Bind(R.id.moviePoster)
     private ImageView mMoviePoster;
-    //@Bind(R.id.movieReleaseYear)
-    private TextView mMovieReleaseYear;
-    //@Bind(R.id.movieRating)
-    private TextView mMovieRating;
-    //@Bind(R.id.movieOverview)
-    private TextView mMovieOverview;
-    //@Bind(R.id.favoriteIcon)
+    private TextView mMovieReleaseYearTxt;
+    private TextView mMovieRatingTxt;
+    private TextView mMovieOverviewTxt;
     private ImageView mMovieFavorite;
 
     private RecyclerView rv;
     private RvJoiner rvJoiner = new RvJoiner();
     private MovieTrailerAdapter trailerAdapter;
     private MovieReviewAdapter reviewAdapter;
+
+    private int mMovieID;
+    private String mMovieTitle;
+    private String mMovieOverview;
+    private String mMovieVotes;
+    private String mMovieReleaseDate;
+    private String mMoviePosterPath;
+    private boolean mIsFavorite;
 
     private static final int DETAIL_LOADER = 0;
 
@@ -174,9 +159,9 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
                 public void onInflateComplete(View view, ViewGroup parent) {
                     mMovieTileTxt = (TextView) view.findViewById(R.id.movieTitle);
                     mMoviePoster = (ImageView) view.findViewById(R.id.moviePoster);
-                    mMovieReleaseYear = (TextView) view.findViewById(R.id.movieReleaseYear);
-                    mMovieRating = (TextView) view.findViewById(R.id.movieRating);
-                    mMovieOverview = (TextView) view.findViewById(R.id.movieOverview);
+                    mMovieReleaseYearTxt = (TextView) view.findViewById(R.id.movieReleaseYear);
+                    mMovieRatingTxt = (TextView) view.findViewById(R.id.movieRating);
+                    mMovieOverviewTxt = (TextView) view.findViewById(R.id.movieOverview);
                     mMovieFavorite = (ImageView) view.findViewById(R.id.favoriteIcon);
 
                     fillDetailsScreen();
@@ -231,13 +216,13 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             return;
         }
 
-        movieID = cursor.getInt(COL_MOVIE_ID);
-        movieTitle = cursor.getString(COL_MOVIE_TITLE);
-        movieOverview = cursor.getString(COL_MOVIE_OVERVIEW);
-        movieVotes = cursor.getString(COL_MOVIE_VOTE_AVERAGE);
-        movieReleaseDate = cursor.getString(COL_MOVIE_RELEASE_DATE);
-        moviePosterPath = cursor.getString(COL_MOVIE_POSTER_PATH);
-        isFavorite = cursor.getInt(COL_MOVIE_IS_FAVORITE) > 0;
+        mMovieID = cursor.getInt(COL_MOVIE_ID);
+        mMovieTitle = cursor.getString(COL_MOVIE_TITLE);
+        mMovieOverview = cursor.getString(COL_MOVIE_OVERVIEW);
+        mMovieVotes = cursor.getString(COL_MOVIE_VOTE_AVERAGE);
+        mMovieReleaseDate = cursor.getString(COL_MOVIE_RELEASE_DATE);
+        mMoviePosterPath = cursor.getString(COL_MOVIE_POSTER_PATH);
+        mIsFavorite = cursor.getInt(COL_MOVIE_IS_FAVORITE) > 0;
 
         fillDetailsScreen();
     }
@@ -246,60 +231,52 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
-    int movieID;
-    String movieTitle;
-    String movieOverview;
-    String movieVotes;
-    String movieReleaseDate;
-    String moviePosterPath;
-    boolean isFavorite;
-
     /**
      * Used to render original title, poster image, overview (plot), user rating and release date.
      */
     private void fillDetailsScreen() {
 
         if (mMovieTileTxt != null) {
-            mMovieTileTxt.setText(movieTitle);
+            mMovieTileTxt.setText(mMovieTitle);
         }
 
         if (mMoviePoster != null) {
             Picasso.with(getContext())
-                    .load(Constants.MOVIE_DB_POSTER_URL + Constants.POSTER_PHONE_SIZE + moviePosterPath)
+                    .load(Constants.MOVIE_DB_POSTER_URL + Constants.POSTER_PHONE_SIZE + mMoviePosterPath)
                     .placeholder(R.drawable.poster_placeholder) // support download placeholder
                     .error(R.drawable.poster_placeholder_error) //support error placeholder, if back-end returns empty string or null
                     .into(mMoviePoster);
         }
 
         //we only want to display ratings rounded up to 3 chars max (e.g. 6.3)
-        if (movieVotes != null && movieVotes.length() >= 3) {
-            movieVotes = movieVotes.substring(0, 3);
+        if (mMovieVotes != null && mMovieVotes.length() >= 3) {
+            mMovieVotes = mMovieVotes.substring(0, 3);
         }
-        if (mMovieRating != null) {
-            mMovieRating.setText("" + movieVotes + "/10");
-        }
-
-        if (mMovieOverview != null) {
-            mMovieOverview.setText(movieOverview);
+        if (mMovieRatingTxt != null) {
+            mMovieRatingTxt.setText("" + mMovieVotes + "/10");
         }
 
-        if (movieReleaseDate != null) {
+        if (mMovieOverviewTxt != null) {
+            mMovieOverviewTxt.setText(mMovieOverview);
+        }
+
+        if (mMovieReleaseDate != null) {
             // Movie DB API returns release date in yyyy--mm-dd format
             // Extract the year through regex
             Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2})");
-            Matcher dateMatcher = datePattern.matcher(movieReleaseDate);
+            Matcher dateMatcher = datePattern.matcher(mMovieReleaseDate);
             if (dateMatcher.find()) {
-                movieReleaseDate = dateMatcher.group(1);
+                mMovieReleaseDate = dateMatcher.group(1);
 
             }
         }
 
-        if (mMovieReleaseYear != null) {
-            mMovieReleaseYear.setText(movieReleaseDate);
+        if (mMovieReleaseYearTxt != null) {
+            mMovieReleaseYearTxt.setText(mMovieReleaseDate);
         }
 
         if (mMovieFavorite != null) {
-            if (isFavorite) {
+            if (mIsFavorite) {
                 showFavoriteIcon(mMovieFavorite, R.drawable.ic_favorite_black_24dp);
             } else {
                 showFavoriteIcon(mMovieFavorite, R.drawable.ic_favorite_border_black_24dp);
@@ -310,13 +287,13 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
                 @Override
                 public void onClick(View v) {
                     // Create and execute the background task.
-                    DBUpdateTask task = new DBUpdateTask(isFavorite, movieID);
+                    DBUpdateTask task = new DBUpdateTask(mIsFavorite, mMovieID);
                     task.execute();
                 }
             });
         }
 
-        fetchMovieTrailersAndReviews(movieID);
+        fetchMovieTrailersAndReviews(mMovieID);
 
     }
 

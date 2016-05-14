@@ -9,7 +9,6 @@ import com.squareup.otto.Subscribe;
 import com.udacity.popularmovies.stagetwo.R;
 import com.udacity.popularmovies.stagetwo.data.MovieContract;
 import com.udacity.popularmovies.stagetwo.event.DiscoverMovieEvent;
-import com.udacity.popularmovies.stagetwo.event.MovieEvent;
 import com.udacity.popularmovies.stagetwo.event.MovieReviewsEvent;
 import com.udacity.popularmovies.stagetwo.event.MovieTrailersEvent;
 import com.udacity.popularmovies.stagetwo.network.model.Movie;
@@ -80,7 +79,7 @@ public class DiscoverMovieServiceImpl {
                     // request successful (status code 200, 201)
                     MovieInfo movieInfo = response.body();
                     mMovieList = movieInfo.getmMovieList();
-                    insertMoveRecords(mMovieList);
+                    insertMovieRecords(mMovieList);
                     PopularMoviesApplication.getEventBus().post(Utility.produceMovieEvent());
                 } else {
                     //request not successful (like 400,401,403 etc)
@@ -176,8 +175,12 @@ public class DiscoverMovieServiceImpl {
         });
     }
 
-    private void insertMoveRecords(final List<Movie> movieList) {
-        // Insert the new weather information into the database
+    /**
+     * Inserts movie JSON result into movie.db DB.
+     * This method is executed in a background worker thread.
+     */
+    private void insertMovieRecords(final List<Movie> movieList) {
+        // Insert the new movie information into the database
         Vector<ContentValues> cVVector = new Vector<ContentValues>(movieList.size());
         String sortCriteria = Utility.getPreferredSortingCriteria(mContext);
 

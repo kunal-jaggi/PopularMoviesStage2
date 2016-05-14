@@ -1,7 +1,7 @@
 package com.udacity.popularmovies.stagetwo.view;
 
-import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 
 import com.udacity.popularmovies.stagetwo.R;
 

@@ -1,6 +1,5 @@
 package com.udacity.popularmovies.stagetwo.event;
 
-import com.udacity.popularmovies.stagetwo.network.model.MovieReview;
 import com.udacity.popularmovies.stagetwo.network.model.Trailer;
 
 import java.util.ArrayList;

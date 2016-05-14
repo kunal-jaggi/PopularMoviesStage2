@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.udacity.popularmovies.stagetwo.R;
-import com.udacity.popularmovies.stagetwo.data.MovieContract;
 import com.udacity.popularmovies.stagetwo.util.Utility;
 
 /**
