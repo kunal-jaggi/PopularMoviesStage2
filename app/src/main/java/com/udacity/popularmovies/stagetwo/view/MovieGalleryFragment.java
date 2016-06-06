@@ -24,6 +24,7 @@ import com.udacity.popularmovies.stagetwo.data.MovieContract;
 import com.udacity.popularmovies.stagetwo.event.MovieEvent;
 import com.udacity.popularmovies.stagetwo.network.service.DiscoverMovieServiceImpl;
 import com.udacity.popularmovies.stagetwo.singleton.PopularMoviesApplication;
+import com.udacity.popularmovies.stagetwo.sync.MovieSyncAdapter;
 import com.udacity.popularmovies.stagetwo.util.Utility;
 
 import butterknife.Bind;
@@ -143,7 +144,7 @@ public class MovieGalleryFragment extends Fragment implements LoaderManager.Load
         mMovieService = new DiscoverMovieServiceImpl(getContext());
         PopularMoviesApplication.getEventBus().register(this);
 
-        //if  user has selected either "popular" or "highest rated", sort criteria, we need to make a web call
+        //if  user has selected either "popular" or "highest rated" sort criteria, we need to make a web call
         if (!Utility.getPreferredSortingCriteria(getContext()).equalsIgnoreCase(getResources().getString(R.string.pref_sort_by_favorite))) {
             fetchMovies();
         }
@@ -154,7 +155,8 @@ public class MovieGalleryFragment extends Fragment implements LoaderManager.Load
      * The sort order is retrieved from Shared Preferences
      */
     private void fetchMovies() {
-        PopularMoviesApplication.getEventBus().post(Utility.produceDiscoverMovieEvent(Utility.getPreferredSortingCriteria(getContext())));
+        //PopularMoviesApplication.getEventBus().post(Utility.produceDiscoverMovieEvent(Utility.getPreferredSortingCriteria(getContext())));
+        MovieSyncAdapter.syncImmediately(getContext());
     }
 
     /**
@@ -245,6 +247,11 @@ public class MovieGalleryFragment extends Fragment implements LoaderManager.Load
 
 
     void onSortCriteriaChanged() {
+        Log.d(LOG_TAG, "onSortCriteriaChanged() called");
+
+        //start sync Adapter
+        MovieSyncAdapter.syncImmediately(getActivity());
+
         //make a web call if the user selected popular or highly rated
         if (!Utility.getPreferredSortingCriteria(getContext()).equalsIgnoreCase(getResources().getString(R.string.pref_sort_by_favorite))) {
             fetchMovies();

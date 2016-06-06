@@ -50,4 +50,8 @@
 
     <string name="img_play_desc">Play</string>
 
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">popularmovies.example.com</string>
+    <string name="content_authority">com.udacity.popularmovies.stagetwo</string>
+
 </resources>
