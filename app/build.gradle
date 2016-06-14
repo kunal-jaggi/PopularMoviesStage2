@@ -49,4 +49,17 @@ dependencies {
 
     compile 'su.j2e:rv-joiner:1.0.7'
 
+    //Gradle dependency on Firebase messaging
+    compile "com.google.firebase:firebase-messaging:9.0.0"
+
+    //Gradle dependency on Firebase analytics
+    compile "com.google.firebase:firebase-core:9.0.0"
+
+    //Gradle dependency on Firebase Crash Reporting
+    compile 'com.google.firebase:firebase-crash:9.0.0'
+
+    //Gradle dependency on Firebase Remote Config
+    compile 'com.google.firebase:firebase-config:9.0.0'
 }
+
+apply plugin: 'com.google.gms.google-services'

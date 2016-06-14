@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.udacity.popularmovies.stagetwo.R;
@@ -55,9 +56,12 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     private static final String LOG_TAG = DetailsFragment.class.getSimpleName();
     private static final String MOVIE_DETAILS_SHARE_HASHTAG = " #PopularMoviesApp";
     static final String MOVIE_ID = "ID";
+    static final String RENTAL_PRICE = "RENTAL_PRICE";
     static final String DETAIL_URI = "URI";
     private Uri mUri;
     private int mMovieId;
+    private long mRentalPrice;
+
 
     private TextView mMovieTileTxt;
     private ImageView mMoviePoster;
@@ -65,6 +69,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     private TextView mMovieRatingTxt;
     private TextView mMovieOverviewTxt;
     private ImageView mMovieFavorite;
+    private TextView mMovieRentalPrice;
 
     private RecyclerView rv;
     private RvJoiner rvJoiner = new RvJoiner();
@@ -141,6 +146,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         if (arguments != null) {
             mUri = arguments.getParcelable(DETAIL_URI);
             mMovieId = arguments.getInt(MOVIE_ID);
+            mRentalPrice = arguments.getLong(RENTAL_PRICE);
         }
 
         View viewRecycler = inflater.inflate(R.layout.fragment_details, container, false);
@@ -163,6 +169,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
                     mMovieRatingTxt = (TextView) view.findViewById(R.id.movieRating);
                     mMovieOverviewTxt = (TextView) view.findViewById(R.id.movieOverview);
                     mMovieFavorite = (ImageView) view.findViewById(R.id.favoriteIcon);
+                    mMovieRentalPrice = (TextView) view.findViewById(R.id.movieRentalPrice);
 
                     fillDetailsScreen();
                 }
@@ -236,6 +243,10 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
      */
     private void fillDetailsScreen() {
 
+        if(mMovieRentalPrice != null){
+            mMovieRentalPrice.setText("Rental $"+mRentalPrice);
+        }
+
         if (mMovieTileTxt != null) {
             mMovieTileTxt.setText(mMovieTitle);
         }
@@ -286,6 +297,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             mMovieFavorite.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    FirebaseCrash.log("Movie ID "+mMovieID+" saved as Favorite");
                     // Create and execute the background task.
                     DBUpdateTask task = new DBUpdateTask(mIsFavorite, mMovieID);
                     task.execute();

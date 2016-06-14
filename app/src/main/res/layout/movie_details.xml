@@ -64,6 +64,15 @@
             android:visibility="invisible"
             android:contentDescription="@string/img_movie_favorite_desc"/>
 
+        <TextView
+            android:id="@+id/movieRentalPrice"
+            style="@style/MovieItemPadding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="210dp"
+            android:layout_toRightOf="@id/moviePoster"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
             android:id="@+id/movieOverview"

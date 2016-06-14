@@ -1,9 +1,15 @@
 package com.udacity.popularmovies.stagetwo.view;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.firebase.crash.FirebaseCrash;
 import com.udacity.popularmovies.stagetwo.R;
 import com.udacity.popularmovies.stagetwo.sync.MovieSyncAdapter;
 import com.udacity.popularmovies.stagetwo.util.Utility;
@@ -15,6 +21,7 @@ import com.udacity.popularmovies.stagetwo.util.Utility;
 
 public class MainActivity extends BaseActivity implements MovieGalleryFragment.Callback {
 
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private final String MOVIEFRAGMENT_TAG = "MFTAG";
     private boolean mTwoPane;
     private String mSortCriteria;
@@ -22,6 +29,9 @@ public class MainActivity extends BaseActivity implements MovieGalleryFragment.C
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        checkGPS(); //ensures that the app can't be used without a successful GPS check
+
         mSortCriteria = Utility.getPreferredSortingCriteria(this);
         setContentView(R.layout.activity_main);
 
@@ -50,6 +60,10 @@ public class MainActivity extends BaseActivity implements MovieGalleryFragment.C
     @Override
     protected void onResume() {
         super.onResume();
+
+        //ensures that if the user returns to the running app through some other means, such as through the back button, the GPS check is still performed
+        checkGPS();
+
         String sortCriteria = Utility.getPreferredSortingCriteria(this);
         // update the location in our second pane using the fragment manager
         if (sortCriteria != null && !sortCriteria.equals(mSortCriteria)) {
@@ -88,6 +102,20 @@ public class MainActivity extends BaseActivity implements MovieGalleryFragment.C
                     .setData(movieUri)
                     .putExtra(DetailsActivity.EXTRA_MOVIE, movieID);
             startActivity(intent);
+        }
+    }
+
+    /**
+     * Checks for Google Play Services (GPS). If GPS is not installed, user will see a pop-up to install GPS from Google Play.
+     */
+    private void checkGPS() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+
+        if (resultCode == ConnectionResult.SERVICE_MISSING ||
+                resultCode == ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED ||
+                resultCode == ConnectionResult.SERVICE_DISABLED) {
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this, 1);
+            dialog.show();
         }
     }
 }
