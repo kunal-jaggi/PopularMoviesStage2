@@ -90,7 +90,8 @@ public class DiscoverMovieServiceImpl {
 
             @Override
             public void onFailure(Throwable t) {
-                Log.d(LOG_TAG, "Web call error. exception: " + toString());
+                Log.d(LOG_TAG, "Web call error. exception: " + t.toString()+ "...printing stack trace below \\n");
+                t.printStackTrace();
             }
         });
     }
