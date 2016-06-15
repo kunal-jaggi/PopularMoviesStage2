@@ -11,6 +11,8 @@ In addition to Stage 1, the Stage 2 project adds the following UI enhancements:
 4. Tablet UI uses a Master-Detail layout implemented using fragments. The left fragment is for discovering movies. The right fragment displays the movie details view for the currently selected movie (screenshot 4)
 
 ## Firebase
+Firebase is a cross-platform  backend-as-a-service (BaaS). The popular movies (part 2) app has been extended to use several Firebase features such as Remote Config, Firebase Cloud Messaging, Analytics  and Crash Reporting.
+
 ### Firebase Analytics
 Firebase Analytics provides insight on app usage and how users are engaging with your app.
 <img src="screenshots/Screenshot5.png" width="40%" />
